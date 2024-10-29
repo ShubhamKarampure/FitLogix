@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react"; // Import useEffect
 import {
   Box,
   Button,
@@ -16,19 +16,23 @@ import {
   ModalBody,
   ModalFooter,
 } from "@chakra-ui/react";
+import { login } from "../../services/authService";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const Login = ({ isOpen, onClose, onRegister }) => {
   const toast = useToast();
-
-  const handleLogin = (e) => {
+  const navigate = useNavigate(); 
+  
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Handle login logic here (e.g., API call)
-    // This is just an example. Replace with actual authentication logic.
     const email = e.target.email.value;
     const password = e.target.password.value;
 
-    // Example validation
-    if (email && password) {
+    try {
+      // Call the login function from authService
+      const userData = await login(email, password);
+      
+      // Show success toast
       toast({
         title: "Login Successful.",
         description: "Welcome back!",
@@ -37,10 +41,13 @@ const Login = ({ isOpen, onClose, onRegister }) => {
         isClosable: true,
       });
       onClose(); // Close the modal on successful login
-    } else {
+      localStorage.setItem("token", userData.token); // Save token to local storage
+      navigate('/dashboard'); // Navigate to the dashboard
+    } catch (error) {
+      // Handle login failure
       toast({
         title: "Login Failed.",
-        description: "Please check your credentials.",
+        description: error.response?.data?.message || "Please check your credentials.",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -49,7 +56,7 @@ const Login = ({ isOpen, onClose, onRegister }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} onRegister={onRegister}>
+    <Modal isOpen={isOpen} onClose={onClose}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Login to Your Account</ModalHeader>

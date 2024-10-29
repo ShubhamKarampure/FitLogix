@@ -1,10 +1,12 @@
+// src/main.js
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
-import Login from "./components/Auth/Login.jsx";
-import Home from "./pages/Home.jsx"
-import { PageNotFound } from "./components/index.js";
+import Home from "./pages/Home.jsx";
+import Dashboard from "./pages/Dashboard.jsx";
+import PageNotFound from "./components/PageNotFound.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx"; 
 import './index.css';
 
 const router = createBrowserRouter([
@@ -14,11 +16,14 @@ const router = createBrowserRouter([
     errorElement: <PageNotFound />,
   },
   {
-    path: "/login",
-    element: <Login />,
+    path: "/dashboard",
+    element: (
+      <ProtectedRoute>
+        <Dashboard />
+      </ProtectedRoute>
+    ),
     errorElement: <PageNotFound />,
   },
-
 ]);
 
 createRoot(document.getElementById("root")).render(

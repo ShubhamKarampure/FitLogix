@@ -2,24 +2,22 @@
 
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/users';
+const API_URL = 'http://localhost:4000/api/v1/users/auth';
 
-export const register = (username, password) => {
-  return axios.post(`${API_URL}/register`, { username, password });
+export const register = (email, password) => {
+  return axios.post(`${API_URL}/register`, { email, password });
 };
 
-export const login = async (username, password) => {
-  const response = await axios.post(`${API_URL}/login`, { username, password });
+export const login = async (email, password) => {
+  const response = await axios.post(`${API_URL}/login`, { email, password });
   if (response.data.token) {
-    localStorage.setItem('userToken', response.data.token);
+    localStorage.setItem('token', response.data.token);
+    localStorage.setItem('user_id', response.data.user_id);
   }
   return response.data;
 };
 
-export const logout = () => {
-  localStorage.removeItem('userToken');
-};
-
-export const getCurrentUser = () => {
-  return localStorage.getItem('userToken');
+export const logout = async () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user_id');
 };

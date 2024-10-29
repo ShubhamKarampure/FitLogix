@@ -49,9 +49,6 @@ const Testimonials = () => {
             </Box>
           ))}
         </SimpleGrid>
-        <Box textAlign="center" mt={8}>
-          <Button size="lg" colorScheme="orange" variant="solid">Join FitTrack Today</Button>
-        </Box>
       </Container>
     </Box>
   );

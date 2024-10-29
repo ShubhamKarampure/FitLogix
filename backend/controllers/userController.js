@@ -6,32 +6,6 @@ import dotenv from 'dotenv';
 dotenv.config();  
 const JWT_SECRET = process.env.JWT_SECRET;
 // Create a new user
-export const registerUser = async (req, res) => {
-  try {
-
-    const { email, password } = req.body;
-
-    // Check if user already exists
-    if (await User.findOne({ email })) {
-      return res.status(400).json({ message: 'Email already in use' });
-    }
-
-    // Hash the password
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    // Create user
-    const newUser = new User({
-      email,
-      passwordHash,
-    });
-
-    // Save user to the database
-    const savedUser = await newUser.save();
-    res.status(201).json(savedUser);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
 
 export const loginUser = async (req, res) => {
   try {
@@ -58,4 +32,18 @@ export const loginUser = async (req, res) => {
 };
 
 
+// User logout
+export const logoutUser = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
+    user.jwtToken = null;
+    await user.save();
+
+    res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

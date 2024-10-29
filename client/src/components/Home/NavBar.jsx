@@ -15,7 +15,9 @@ import {
   Image,
 } from '@chakra-ui/react';
 import { FaSearch } from 'react-icons/fa';
-import logo from '../../assets/logo.png'
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import logo from '../../assets/logo.png';
+import { px } from 'framer-motion';
 
 const NavLink = ({ children, href }) => (
   <Link
@@ -33,12 +35,32 @@ const NavLink = ({ children, href }) => (
   </Link>
 );
 
-const Navbar = ({ onLoginOpen, onRegisterOpen }) => {
+const HomeNavbar = ({ onLoginOpen, onRegisterOpen }) => {
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  const handleLoginClick = () => {
+    const token = localStorage.getItem('token'); // Check for token
+    if (token) {
+      navigate('/dashboard'); // Navigate to dashboard if token exists
+    } else {
+      onLoginOpen(); // Open login modal if no token
+    }
+  };
+
+  const handleRegisterClick = () => {
+    const token = localStorage.getItem('token'); // Check for token
+    if (token) {
+      navigate('/dashboard'); // Navigate to dashboard if token exists
+    } else {
+      onRegisterOpen(); // Open register modal if no token
+    }
+  };
+
   return (
     <Box
       bg={useColorModeValue('white', 'black')} // White background for light mode, black for dark mode
       color={useColorModeValue('black', 'white')} // Black text for light mode, white for dark mode
-      px={4}
+      px={6}
       boxShadow="md"
       position="fixed" // Keep navbar fixed on scroll
       width="100%" // Make sure it spans the full width
@@ -87,16 +109,16 @@ const Navbar = ({ onLoginOpen, onRegisterOpen }) => {
             variant="outline"
             colorScheme="orange" // Orange color scheme for the button
           />
-          <Button variant={'solid'} colorScheme={'orange'} size={'sm'} onClick={onLoginOpen}>
+          <Button variant={'solid'} colorScheme={'orange'} size={'sm'} onClick={handleLoginClick}>
             Log In
           </Button>
-          <Button variant={'outline'} color={'orange.300'} size={'sm'} onClick={onRegisterOpen}>
+          <Button variant={'outline'} color={'orange.300'} size={'sm'} onClick={handleRegisterClick}>
             Sign Up
           </Button>
         </HStack>
       </Flex>
     </Box>
-  )
+  );
 };
 
-export default Navbar;
+export default HomeNavbar;

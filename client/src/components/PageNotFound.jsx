@@ -19,10 +19,10 @@ const PageNotFound = () => {
 
                 <p>The page you are looking for not available!</p>
 
-                <Link to='/login'
+                <Link to='/'
                   className=" py-[13px] px-10 text-lg bg-caribbeangreen-200 hover:bg-caribbeangreen-400 my-5 inline-block rounded-full font-semibold duration-300"
                 >
-                  Login
+                  Home
                 </Link>
               </div>
             </div>

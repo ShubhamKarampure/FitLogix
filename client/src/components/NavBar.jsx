@@ -18,8 +18,8 @@ import { FiBell, FiMessageCircle } from 'react-icons/fi';
 import { logout } from '../services/authService';
 import { useNavigate } from 'react-router-dom';
 
-const Navbar = ({ userName }) => {
-  const navigate = useNavigate(); // Initialize useNavigate
+const Navbar = ({page,avatar}) => {
+  const navigate = useNavigate(); 
   const toast = useToast();
 
   const handleLogout = () => {
@@ -44,7 +44,7 @@ const Navbar = ({ userName }) => {
     >
       <Flex h={24} alignItems="center" justifyContent="space-between">
         <Text fontSize="xl" fontWeight="bold" color="black">
-          Dashboard
+          {page}
         </Text>
 
         <HStack spacing={4} ml="auto" alignItems="center">
@@ -79,10 +79,7 @@ const Navbar = ({ userName }) => {
           <Menu>
             <MenuButton as={Button} variant="link">
               <HStack spacing={2}>
-                <Avatar name={userName} size="md" />
-                <Text fontWeight="medium" color="black">
-                  {userName}
-                </Text>
+                <Avatar size="md" src={avatar}/>
               </HStack>
             </MenuButton>
             <MenuList>

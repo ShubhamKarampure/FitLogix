@@ -1,13 +1,27 @@
 import React from 'react';
-import { Flex, Heading, Button, Spacer } from '@chakra-ui/react';
-import { FiLogOut } from 'react-icons/fi';
+import { Flex, Heading, Text } from '@chakra-ui/react';
+import { Star, Smile } from 'lucide-react'; // Import icons for a more exciting visual
 
-const Header = ({ userName }) => {
+const Header = ({ name }) => {
   return (
-    <Flex as="header" bg="brand.black" color="brand.white" p={4} alignItems="center" mt={3}>
-      <Heading size="lg" fontWeight="bold">
-        Welcome, {userName}
-      </Heading>
+    <Flex
+      as="header"
+      bg="brand.black"
+      color="brand.white"
+      p={4}
+      alignItems="center"
+      justifyContent="space-between" // Space between elements
+      mt={3}
+    >
+      <Flex alignItems="center">
+        <Star className="text-yellow-400" size={28} /> {/* Star icon for excitement */}
+        <Heading size="lg" fontWeight="bold" ml={2}>
+          Welcome, {name}!
+        </Heading>
+      </Flex>
+      <Text fontSize="lg" fontWeight="medium" color="gray.300" textAlign="right">
+        🌟 Let's make today amazing! <Smile className="inline" size={20} />
+      </Text>
     </Flex>
   );
 };

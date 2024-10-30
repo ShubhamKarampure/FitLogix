@@ -7,7 +7,6 @@ const UserSchema = new mongoose.Schema(
     passwordHash: { type: String, required: true },
     jwtToken: { type: String },
 
-    // Linking other models
     profile: { type: mongoose.Schema.Types.ObjectId, ref: 'Profile' },
     fitnessGoals: { type: mongoose.Schema.Types.ObjectId, ref: 'FitnessGoals' },
     preferences: { type: mongoose.Schema.Types.ObjectId, ref: 'Preferences' },

@@ -12,7 +12,7 @@ const Sidebar = () => {
     { path: '/dashboard', icon: FaHome, label: 'Dashboard' },
     { path: '/profile', icon: FaUser, label: 'Profile' },
     { path: '/workout-plans', icon: FaDumbbell, label: 'Workout' },
-    { path: '/meal-plans', icon: FaUtensils, label: 'Meals' },
+    { path: '/meal-log', icon: FaUtensils, label: 'Meals' },
     { path: '/progress-tracking', icon: FaChartLine, label: 'Progress' },
     { path: '/notifications', icon: FaBell, label: 'Notifications' },
     { path: '/settings', icon: FaCog, label: 'Settings' },

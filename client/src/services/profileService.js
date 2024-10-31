@@ -1,5 +1,5 @@
 // services/profileService.js
-const API_URL = 'http://localhost:4000/api/v1/users/profile/setup';
+import { API_ROUTES } from './apiRoutes'; // Import API_ROUTES
 
 const profileService = {
   createProfile: async (profileData) => {
@@ -18,7 +18,7 @@ const profileService = {
       formData.append('avatar', profileData.avatar);
     }
 
-    const response = await fetch(API_URL, {
+    const response = await fetch(API_ROUTES.CREATEPROFILE, { // Use API_ROUTES for the URL
       method: 'POST',
       body: formData,
     });
@@ -32,4 +32,3 @@ const profileService = {
 };
 
 export default profileService;
- 

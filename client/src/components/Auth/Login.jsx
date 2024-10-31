@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"; // Import useEffect
+import React from "react";
 import {
   Box,
   Button,
@@ -17,7 +17,7 @@ import {
   ModalFooter,
 } from "@chakra-ui/react";
 import { login } from "../../services/authService";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom"; 
 
 const Login = ({ isOpen, onClose, onRegister }) => {
   const toast = useToast();
@@ -27,12 +27,8 @@ const Login = ({ isOpen, onClose, onRegister }) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
-
     try {
-      // Call the login function from authService
-      const userData = await login(email, password);
-      
-      // Show success toast
+      await login(email, password);
       toast({
         title: "Login Successful.",
         description: "Welcome back!",
@@ -40,11 +36,9 @@ const Login = ({ isOpen, onClose, onRegister }) => {
         duration: 3000,
         isClosable: true,
       });
-      onClose(); // Close the modal on successful login
-      localStorage.setItem("token", userData.token); // Save token to local storage
-      navigate('/dashboard'); // Navigate to the dashboard
+      onClose(); 
+      navigate('/home/dashboard'); 
     } catch (error) {
-      // Handle login failure
       toast({
         title: "Login Failed.",
         description: error.response?.data?.message || "Please check your credentials.",
@@ -64,8 +58,9 @@ const Login = ({ isOpen, onClose, onRegister }) => {
         <ModalBody>
           <form onSubmit={handleLogin}>
             <FormControl mb={4}>
-              <FormLabel>Email</FormLabel>
+              <FormLabel htmlFor="email">Email</FormLabel>
               <Input
+                id="email"  // Added id attribute
                 name="email"
                 type="email"
                 placeholder="Enter your email"
@@ -73,8 +68,9 @@ const Login = ({ isOpen, onClose, onRegister }) => {
               />
             </FormControl>
             <FormControl mb={4}>
-              <FormLabel>Password</FormLabel>
+              <FormLabel htmlFor="password">Password</FormLabel>
               <Input
+                id="password"  // Added id attribute
                 name="password"
                 type="password"
                 placeholder="Enter your password"

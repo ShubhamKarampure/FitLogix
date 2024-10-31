@@ -1,13 +1,13 @@
 import React from 'react';
 import { Box, useDisclosure } from '@chakra-ui/react';
-import Hero from '../components/Home/Hero';
-import Features from '../components/Home/Features';
-import Testimonials from '../components/Home/Testimonials';
-import Footer from '../components/Home/Footer';
-import TrackYourProgress from '../components/Home/ProgressTrack';
+import Hero from '../components/LandingPage/Hero';
+import Features from '../components/LandingPage/Features';
+import Testimonials from '../components/LandingPage/Testimonials';
+import Footer from '../components/LandingPage/Footer';
+import TrackYourProgress from '../components/LandingPage/ProgressTrack';
 import Login from '../components/Auth/Login';
 import Register from '../components/auth/Register';
-import HomeNavbar from '../components/Home/NavBar';
+import HomeNavbar from '../components/LandingPage/NavBar';
 
 const LandingPage = () => {
   const { isOpen: isLoginOpen, onOpen: onLoginOpen, onClose: onLoginClose } = useDisclosure();

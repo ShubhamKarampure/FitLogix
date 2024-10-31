@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button, Input, FormControl, FormLabel, Radio, RadioGroup, Stack, Avatar, Text, Box, Progress, useToast } from '@chakra-ui/react';
+import { Button, Input, FormControl, FormLabel, Radio, RadioGroup, Stack, Avatar, Text, Box, Progress, useToast, Spinner } from '@chakra-ui/react';
 import { ArrowRight, UserCircle2 } from 'lucide-react';
 import profileService from '../services/profileService';
 import { useNavigate } from "react-router-dom";
@@ -17,6 +17,7 @@ export default function Setup() {
         gender: '',
         avatar: null,
     });
+    const [loading, setLoading] = useState(false); // Loading state
 
     useEffect(() => {
         const userId = localStorage.getItem('user_id'); // Adjust key as needed
@@ -43,11 +44,12 @@ export default function Setup() {
         }
     };
 
-  const handleNext = () => {
-
-    if (step === 1) { // Weight step
+    const handleNext = () => {
+        // Validation logic for age, weight, and height
+        // (same as before)
+        if (step === 1) { // Weight step
             const age = parseFloat(profile.age);
-            if (age<18) { // Assuming human weight range
+            if (age < 18) {
                 toast({
                     title: "Invalid Age",
                     description: "We only serve adults",
@@ -57,11 +59,11 @@ export default function Setup() {
                 });
                 return;
             }
-    }
-    
+        }
+
         if (step === 2) { // Weight step
             const weight = parseFloat(profile.weight);
-            if (weight < 30 || weight > 300) { // Assuming human weight range
+            if (weight < 30 || weight > 300) { 
                 toast({
                     title: "Invalid Weight",
                     description: "Please enter a valid weight between 30kg and 300kg.",
@@ -75,7 +77,7 @@ export default function Setup() {
 
         if (step === 3) { // Height step
             const height = parseFloat(profile.height);
-            if (height < 50 || height > 250) { // Assuming human height range
+            if (height < 50 || height > 250) { 
                 toast({
                     title: "Invalid Height",
                     description: "Please enter a valid height between 50cm and 250cm.",
@@ -108,12 +110,16 @@ export default function Setup() {
             console.error('Profile is incomplete. Cannot submit.');
             return;
         }
+
+        setLoading(true); // Start loading
         try {
             const response = await profileService.createProfile(profile);
             console.log('Profile created successfully:', response);
             navigate('/dashboard');
         } catch (error) {
             console.error('Error creating profile:', error);
+        } finally {
+            setLoading(false); // Stop loading
         }
     };
 
@@ -271,17 +277,23 @@ export default function Setup() {
                                 Next <ArrowRight className="ml-2 h-4 w-4" />
                             </Button>
                         ) : (
-                            <Button 
-                                type="submit" 
-                                colorScheme="orange" 
-                                isDisabled={!isFormComplete()} // Disable if the form is not complete
+                            <Button
+                                type="submit"
+                                colorScheme="orange"
+                                isLoading={loading} // Show loading state
                             >
-                                Complete Profile
+                                Submit
                             </Button>
                         )}
                     </div>
-                    <Progress value={(step + 1) * (100 / steps.length)} size="lg" colorScheme="orange" borderRadius="md" mt={4} />
                 </form>
+
+                {loading && ( // Show loading spinner
+                    <Box textAlign="center" mt={4}>
+                        <Spinner size="lg" />
+                        <Text mt={2}>Submitting...</Text>
+                    </Box>
+                )}
             </div>
         </div>
     );

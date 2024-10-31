@@ -15,9 +15,9 @@ import {
   Image,
 } from '@chakra-ui/react';
 import { FaSearch } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
-import { px } from 'framer-motion';
+import { useAuth } from '../../context/AuthContext';
 
 const NavLink = ({ children, href }) => (
   <Link
@@ -26,9 +26,9 @@ const NavLink = ({ children, href }) => (
     rounded={'md'}
     _hover={{
       textDecoration: 'none',
-      bg: useColorModeValue('orange.300', 'orange.600'), // Change hover color to orange
+      bg: useColorModeValue('orange.300', 'orange.600'),
     }}
-    color={useColorModeValue('black', 'white')} // Black text for light mode, white for dark mode
+    color={useColorModeValue('black', 'white')}
     href={href}
   >
     {children}
@@ -36,42 +36,48 @@ const NavLink = ({ children, href }) => (
 );
 
 const HomeNavbar = ({ onLoginOpen, onRegisterOpen }) => {
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
+  const { isAuthenticated, loading } = useAuth();
 
+  // Handle login click
   const handleLoginClick = () => {
-    const token = localStorage.getItem('token'); // Check for token
-    if (token) {
-      navigate('/dashboard'); // Navigate to dashboard if token exists
+    if (isAuthenticated) {
+      navigate('home/dashboard');
     } else {
-      onLoginOpen(); // Open login modal if no token
+      onLoginOpen();
     }
   };
 
+  // Handle register click
   const handleRegisterClick = () => {
-    const token = localStorage.getItem('token'); // Check for token
-    if (token) {
-      navigate('/dashboard'); // Navigate to dashboard if token exists
+    if (isAuthenticated) {
+      navigate('home/dashboard');
     } else {
-      onRegisterOpen(); // Open register modal if no token
+      onRegisterOpen();
     }
   };
+
+  // Always return loading state before rendering the navbar
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Box
-      bg={useColorModeValue('white', 'black')} // White background for light mode, black for dark mode
-      color={useColorModeValue('black', 'white')} // Black text for light mode, white for dark mode
+      bg={useColorModeValue('white', 'black')}
+      color={useColorModeValue('black', 'white')}
       px={6}
       boxShadow="md"
-      position="fixed" // Keep navbar fixed on scroll
-      width="100%" // Make sure it spans the full width
-      zIndex="1000" // Ensure it stays above other content
+      position="fixed"
+      width="100%"
+      zIndex="1000"
     >
       <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
         <HStack spacing={8} alignItems={'center'}>
           <Image
             src={logo}
             alt="FitTrack Logo"
-            height="50px" // Adjust height as needed
+            height="50px"
           />
           <HStack as={'nav'} spacing={4} display={{ base: 'none', md: 'flex' }}>
             <NavLink href="#">Home</NavLink>
@@ -99,15 +105,15 @@ const HomeNavbar = ({ onLoginOpen, onRegisterOpen }) => {
             size="md"
             variant="filled"
             width="200px"
-            color={useColorModeValue('black', 'white')} // Black placeholder text in light mode
-            bg={useColorModeValue('gray.100', 'gray.700')} // Light gray background for input
-            borderColor={useColorModeValue('orange.300', 'orange.600')} // Orange border
+            color={useColorModeValue('black', 'white')}
+            bg={useColorModeValue('gray.100', 'gray.700')}
+            borderColor={useColorModeValue('orange.300', 'orange.600')}
           />
           <IconButton
             aria-label="Search database"
             icon={<FaSearch />}
             variant="outline"
-            colorScheme="orange" // Orange color scheme for the button
+            colorScheme="orange"
           />
           <Button variant={'solid'} colorScheme={'orange'} size={'sm'} onClick={handleLoginClick}>
             Log In

@@ -18,7 +18,8 @@ import { FiBell, FiMessageCircle } from 'react-icons/fi';
 import { logout } from '../services/authService';
 import { useNavigate } from 'react-router-dom';
 
-const Navbar = ({page,avatar}) => {
+const Navbar = ({ page, avatar }) => {
+  
   const navigate = useNavigate(); 
   const toast = useToast();
 

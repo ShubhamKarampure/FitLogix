@@ -8,6 +8,7 @@ const UserSchema = new mongoose.Schema(
     jwtToken: { type: String },
 
     profile: { type: mongoose.Schema.Types.ObjectId, ref: 'Profile' },
+    meallog: { type: mongoose.Schema.Types.ObjectId, ref: 'MealLog' },
     fitnessGoals: { type: mongoose.Schema.Types.ObjectId, ref: 'FitnessGoals' },
     preferences: { type: mongoose.Schema.Types.ObjectId, ref: 'Preferences' },
 

@@ -9,13 +9,13 @@ const Sidebar = () => {
 
   // Define the menu items with path, icon, and label
   const menuItems = [
-    { path: '/dashboard', icon: FaHome, label: 'Dashboard' },
-    { path: '/profile', icon: FaUser, label: 'Profile' },
-    { path: '/workout-plans', icon: FaDumbbell, label: 'Workout' },
-    { path: '/meal-log', icon: FaUtensils, label: 'Meals' },
-    { path: '/progress-tracking', icon: FaChartLine, label: 'Progress' },
-    { path: '/notifications', icon: FaBell, label: 'Notifications' },
-    { path: '/settings', icon: FaCog, label: 'Settings' },
+    { path: '/home/dashboard', icon: FaHome, label: 'Dashboard' },
+    { path: '/home/profile', icon: FaUser, label: 'Profile' },
+    { path: '/home/workout-plans', icon: FaDumbbell, label: 'Workout' },
+    { path: '/home/meal-log', icon: FaUtensils, label: 'Meals' },
+    { path: '/home/progress-tracking', icon: FaChartLine, label: 'Progress' },
+    { path: '/home/notifications', icon: FaBell, label: 'Notifications' },
+    { path: '/home/settings', icon: FaCog, label: 'Settings' },
   ];
 
   return (

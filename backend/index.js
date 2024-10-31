@@ -2,31 +2,38 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { authRoutes } from './routes/authRoutes.js';
-import { userRoutes } from './routes/userRoutes.js'
-import { profileRoutes } from './routes/profileRoutes.js';
-import { testRoutes } from './routes/test.js'
+import cookieParser from 'cookie-parser';
+import { authRoutes } from './src/routes/authRoutes.js';
+import { userRoutes } from './src/routes/userRoutes.js';
+import { profileRoutes } from './src/routes/profileRoutes.js';
+import { mealLogRoutes } from './src/routes/mealLogRoutes.js';
+import { verifyToken } from './src/middleware/authMiddleware.js';
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
-app.use(express.json());
-app.use(cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true,
-    methods: ['GET', 'PUT', 'POST', 'DELETE', 'PATCH']
-}));
 
-mongoose.connect(process.env.MONGO_URI, {
-})
+// CORS configuration
+const corsOptions = {
+    origin: process.env.FRONTEND_URL, // Your frontend URL, e.g., 'http://localhost:5173'
+    credentials: true, // Allow credentials (cookies, authorization headers)
+    methods: ['GET', 'PUT', 'POST', 'DELETE', 'PATCH'], // Allowed methods
+};
+
+// Middleware setup
+app.use(cors(corsOptions));
+app.use(cookieParser());
+app.use(express.json());
+
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.error(err));
 
-app.use('/api/v1/users/', userRoutes);
-app.use('/api/v1/users/profile', profileRoutes);
-app.use('/api/v1/users/auth', authRoutes);
-app.use('/api/v1/test', testRoutes);
+// Define your routes
+app.use('/api/v1/auth', authRoutes); // Authentication routes for login/register
+app.use('/api/v1/users', verifyToken, userRoutes); // General user management
+app.use('/api/v1/profile', verifyToken, profileRoutes); // Profile actions for the authenticated user
+app.use('/api/v1/meals', verifyToken, mealLogRoutes); // Meal logging for the authenticated user
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

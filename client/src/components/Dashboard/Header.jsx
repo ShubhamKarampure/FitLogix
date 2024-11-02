@@ -2,7 +2,9 @@ import React from 'react';
 import { Flex, Heading, Text } from '@chakra-ui/react';
 import { Star, Smile } from 'lucide-react'; // Import icons for a more exciting visual
 
+
 const Header = ({ name }) => {
+
   return (
     <Flex
       as="header"

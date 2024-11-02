@@ -7,10 +7,10 @@ import WorkoutLog from "../components/Dashboard/WorkoutLog";
 import MealLog from "../components/Dashboard/MealLog";
 import ProgressTracking from "../components/Dashboard/ProgressTracking";
 import HealthTips from "../components/Dashboard/HealthTips";
-import { useAuth } from "../context/AuthContext";
+import { useUser } from "../context/userContext";
 
 const Dashboard = () => {
-  const { user, loading: authLoading } = useAuth(); // Ensure loading state is provided
+  const { user, loading: authLoading } = useUser(); // Ensure loading state is provided
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -18,7 +18,7 @@ const Dashboard = () => {
     // Check if user is authenticated and loading is complete
     if (!authLoading) {
       if (!user || !user.profile) { // Check if user or profile is not set
-        navigate('/setup'); // Redirect to /setup
+        navigate('/home/setup'); // Redirect to /setup
       } else {
         setLoading(false); // Set loading to false if the profile exists
       }

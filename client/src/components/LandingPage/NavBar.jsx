@@ -10,14 +10,13 @@ import {
   MenuItem,
   Input,
   IconButton,
-  useColorModeValue,
   Link,
   Image,
 } from '@chakra-ui/react';
 import { FaSearch } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
-import { useAuth } from '../../context/AuthContext';
+import { useUser } from '../../context/userContext';
 
 const NavLink = ({ children, href }) => (
   <Link
@@ -26,9 +25,9 @@ const NavLink = ({ children, href }) => (
     rounded={'md'}
     _hover={{
       textDecoration: 'none',
-      bg: useColorModeValue('orange.300', 'orange.600'),
+      bg: 'orange.300', // Light mode hover color
     }}
-    color={useColorModeValue('black', 'white')}
+    color="black" // Light mode text color
     href={href}
   >
     {children}
@@ -37,8 +36,8 @@ const NavLink = ({ children, href }) => (
 
 const HomeNavbar = ({ onLoginOpen, onRegisterOpen }) => {
   const navigate = useNavigate();
-  const { isAuthenticated, loading } = useAuth();
-
+  const { isAuthenticated, loading } = useUser();
+  
   // Handle login click
   const handleLoginClick = () => {
     if (isAuthenticated) {
@@ -57,15 +56,12 @@ const HomeNavbar = ({ onLoginOpen, onRegisterOpen }) => {
     }
   };
 
-  // Always return loading state before rendering the navbar
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+ 
 
   return (
     <Box
-      bg={useColorModeValue('white', 'black')}
-      color={useColorModeValue('black', 'white')}
+      bg="white" // Light mode background color
+      color="black" // Light mode text color
       px={6}
       boxShadow="md"
       position="fixed"
@@ -85,7 +81,7 @@ const HomeNavbar = ({ onLoginOpen, onRegisterOpen }) => {
             <NavLink href="#">Pricing</NavLink>
             <NavLink href="#">About</NavLink>
             <Menu>
-              <MenuButton as={Button} variant="link" color={useColorModeValue('black', 'white')}>
+              <MenuButton as={Button} variant="link" color="black">
                 More
               </MenuButton>
               <MenuList>
@@ -105,9 +101,9 @@ const HomeNavbar = ({ onLoginOpen, onRegisterOpen }) => {
             size="md"
             variant="filled"
             width="200px"
-            color={useColorModeValue('black', 'white')}
-            bg={useColorModeValue('gray.100', 'gray.700')}
-            borderColor={useColorModeValue('orange.300', 'orange.600')}
+            color="black" // Light mode input text color
+            bg="gray.100" // Light mode input background
+            borderColor="orange.300"
           />
           <IconButton
             aria-label="Search database"

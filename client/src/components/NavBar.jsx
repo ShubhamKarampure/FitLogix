@@ -15,23 +15,34 @@ import {
   Button,
 } from '@chakra-ui/react';
 import { FiBell, FiMessageCircle } from 'react-icons/fi';
-import { logout } from '../services/authService';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../context/userContext';
 
-const Navbar = ({ page, avatar }) => {
-  
+const Navbar = ({ page }) => {
+  const { isAuthenticated, checkAuth, loading, logout,user } = useUser(); // Use the logout from AuthContext
   const navigate = useNavigate(); 
   const toast = useToast();
 
-  const handleLogout = () => {
-    logout();
-     toast({
+  const handleLogout = async () => {
+    try {
+      await logout(); // Call the logout function from AuthContext
+      await checkAuth(); // Re-check authentication status
+      toast({
         title: "Logout Successful.",
         status: "success",
         duration: 3000,
         isClosable: true,
       });
-    navigate('/');
+      navigate('/'); 
+    } catch (error) {
+      console.error("Logout failed", error);
+      toast({
+        title: "Logout Failed.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
   return (
@@ -80,7 +91,7 @@ const Navbar = ({ page, avatar }) => {
           <Menu>
             <MenuButton as={Button} variant="link">
               <HStack spacing={2}>
-                <Avatar size="md" src={avatar}/>
+                <Avatar size="md" name={user.profile.name } src={user.profile.avatar} />
               </HStack>
             </MenuButton>
             <MenuList>

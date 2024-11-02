@@ -5,11 +5,12 @@ import cloudinary from '../config/cloudinary.js';
 // Create a new profile
 export const createProfile = async (req, res) => {
   try {
-    const { user, name, age, weight, height, gender } = req.body;
+    const { name, age, weight, height, gender } = req.body;
     const avatarFile = req.file;
-
+    const userId = req.userId;
     // Check if the profile already exists for the user
-    const existingProfile = await Profile.findOne({ user });
+    const existingProfile = await Profile.findOne({ user: userId  });
+    
     if (existingProfile) {
       return res.status(400).json({ message: 'Profile already exists for this user' });
     }
@@ -35,7 +36,7 @@ export const createProfile = async (req, res) => {
 
     // Create a new profile
     const newProfile = new Profile({
-      user, 
+      user:userId, 
       name,
       age,
       weight,
@@ -48,9 +49,9 @@ export const createProfile = async (req, res) => {
     await newProfile.save();
 
     // Update the user document to reference the new profile
-    await User.findByIdAndUpdate(user, { profile: newProfile._id }, { new: true });
+    await User.findByIdAndUpdate(userId, { profile: newProfile._id }, { new: true });
 
-    res.status(201).json(newProfile);
+    res.status(200).json({ message: 'Profile Created Successfully' });
   } catch (error) {
     console.error('Error creating profile:', error);
     res.status(500).json({ message: 'Error creating profile', error });
@@ -66,8 +67,6 @@ export const getProfile = async (req, res) => {
     if (!profile) {
       return res.status(404).json({ message: 'Profile not found' });
     }
-
-    res.status(200).json(profile);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -88,7 +87,7 @@ export const updateProfile = async (req, res) => {
       return res.status(404).json({ message: 'Profile not found' });
     }
 
-    res.status(200).json(profile);
+    res.status(200).json({ message: 'Profile updated sucessfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -16,10 +16,13 @@ import {
   ModalBody,
   ModalFooter,
 } from '@chakra-ui/react';
-import { register } from '../../services/authService'; 
+import { useUser } from "../../context/userContext";
+import { useNavigate } from "react-router-dom"; 
 
 const Register = ({ isOpen, onClose, onLogin }) => {
+  const navigate = useNavigate();
   const toast = useToast();
+  const { login, register } = useUser();
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -53,6 +56,8 @@ const Register = ({ isOpen, onClose, onLogin }) => {
         isClosable: true,
       });
       onClose(); // Close the modal on successful registration
+      login(email, password);
+      navigate('/home/dashboard');
     } catch (error) {
       // Handle registration failure
       toast({

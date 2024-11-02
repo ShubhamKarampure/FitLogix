@@ -1,7 +1,9 @@
 import React from 'react';
 import { Avatar, Button, Box, Heading, Text, Flex } from '@chakra-ui/react';
-
+import { useUser } from '../../context/userContext';
 const UserInfo = () => {
+  const { user } = useUser();
+
   return (
     <Box mt={12}>
       
@@ -9,7 +11,8 @@ const UserInfo = () => {
           <Box position="relative">
             <Avatar
               size="2xl"
-              name="John Doe"
+            name={user.profile.name}
+            src={user.profile.avatar}
               border="4px solid"
               borderColor="orange.300" // Updated border color
             />
@@ -49,12 +52,9 @@ const UserInfo = () => {
             <input id="profile-upload" type="file" hidden accept="image/*" />
           </Box>
           <Heading as="h2" size="xl" mt={4}>
-            John Doe
+            {user.profile.name}
           </Heading>
-          <Text color="gray.500">@johndoe</Text>
-          <Text fontSize="sm" color="gray.500" mt={1}>
-            New York, NY
-          </Text>
+        <Text color="gray.500">{user.email}</Text>
           <Text
             mt={4}
             textAlign="center"

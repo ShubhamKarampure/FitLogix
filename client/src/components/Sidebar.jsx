@@ -29,7 +29,9 @@ const Sidebar = () => {
       zIndex="1001"
     >
       <Stack spacing={6} align="center">
-        <Image src={logo} alt="Logo" boxSize="30px" /> {/* Adjusted logo size */}
+       <Link to="/">
+      <Image src={logo} alt="Logo" boxSize="30px" />
+    </Link> {/* Adjusted logo size */}
         <Stack spacing={4} align="flex-start" width="100%">
           {menuItems.map((item) => {
             const isActive = location.pathname === item.path;

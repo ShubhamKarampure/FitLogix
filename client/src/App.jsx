@@ -2,7 +2,7 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider } from "./context/userContext";
 import Dashboard from "./pages/Dashboard";
 import Setup from "./pages/Setup";
 import PageNotFound from "./pages/PageNotFound";
@@ -11,6 +11,8 @@ import MealLog from "./pages/MealLog";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import LandingPage from "./pages/LandingPage";
+import RedirectToSetup from "./components/RedirectToSetup";
+import ProfileUpdate from "./components/UserProfile/UpdateProfile";
 
 const router = createBrowserRouter([
   {
@@ -19,20 +21,27 @@ const router = createBrowserRouter([
     errorElement: <PageNotFound />,
   },
   {
+    path: "/setup",
+    element: (
+      <ProtectedRoute>
+        <Setup />
+      </ProtectedRoute>
+    ),
+    errorElement: <PageNotFound />,
+  },
+  {
     path: "/home",
     element: (
       <ProtectedRoute>
-        <Layout />
+        <RedirectToSetup>
+          <Layout />
+        </RedirectToSetup>
       </ProtectedRoute>
     ),
     children: [
       {
         path: "dashboard",
         element: <Dashboard />,
-      },
-      {
-        path: "setup",
-        element: <Setup />,
       },
       {
         path: "profile",
@@ -42,6 +51,10 @@ const router = createBrowserRouter([
         path: "meal-log",
         element: <MealLog />,
       },
+      {
+        path: "update",
+        element: <ProfileUpdate />,
+      }
     ],
     errorElement: <PageNotFound />,
   },
@@ -50,7 +63,7 @@ const router = createBrowserRouter([
 export default function App() {
   return (
     <ChakraProvider>
-      <AuthProvider> {/* Wrap with AuthProvider */}
+      <AuthProvider>
         <RouterProvider router={router} />
       </AuthProvider>
     </ChakraProvider>

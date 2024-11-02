@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 const mealLogSchema = new mongoose.Schema({
   userId: {
-    type: mongoose.Schema.Types.ObjectId, // Reference to the user who logged the meal
+    type: mongoose.Schema.Types.ObjectId, 
     required: true,
     ref: 'User' 
   },

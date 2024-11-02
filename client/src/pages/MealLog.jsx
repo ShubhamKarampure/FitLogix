@@ -2,362 +2,262 @@ import React, { useState } from 'react'
 import {
   Box,
   Button,
+  Card,
+  CardBody,
   Container,
   Flex,
-  FormControl,
-  FormLabel,
   Heading,
-  Input,
-  Select,
-  Textarea,
-  VStack,
-  Text,
-  useToast,
   Image,
-  Grid,
-  GridItem,
-  List,
-  ListItem,
-  Divider,
-  Checkbox,
+  Input,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverBody,
   Stack,
-  Badge,
+  Text,
+  VStack,
+  HStack,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Slider,
+  SliderTrack,
+  SliderFilledTrack,
+  SliderThumb,
+  FormLabel,
 } from '@chakra-ui/react'
+import { ChevronDownIcon, AddIcon, CloseIcon, SearchIcon } from '@chakra-ui/icons'
+
+// Mock data for food items
+const foodItems = [
+  { id: 1, name: 'Grilled Chicken', calories: 165, protein: 31, carbs: 0, fat: 3.6, image: '/placeholder.svg?height=100&width=100' },
+  { id: 2, name: 'Brown Rice', calories: 216, protein: 5, carbs: 45, fat: 1.6, image: '/placeholder.svg?height=100&width=100' },
+  { id: 3, name: 'Broccoli', calories: 55, protein: 4, carbs: 11, fat: 0.6, image: '/placeholder.svg?height=100&width=100' },
+  { id: 4, name: 'Salmon', calories: 206, protein: 22, carbs: 0, fat: 13, image: '/placeholder.svg?height=100&width=100' },
+  { id: 5, name: 'Sweet Potato', calories: 180, protein: 2, carbs: 41, fat: 0.1, image: '/placeholder.svg?height=100&width=100' },
+]
 
 export default function MealLog() {
-  const [mealType, setMealType] = useState('')
-  const [imageFile, setImageFile] = useState(null)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [analyzedMeal, setAnalyzedMeal] = useState(null)
-  const [isGeneratingRecipe, setIsGeneratingRecipe] = useState(false)
-  const [generatedRecipe, setGeneratedRecipe] = useState(null)
-  const toast = useToast()
+  const [selectedMeal, setSelectedMeal] = useState('Lunch')
+  const [mealTypes, setMealTypes] = useState(['Breakfast', 'Lunch', 'Dinner', 'Snack'])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [addedFoods, setAddedFoods] = useState([])
+  const [newMealType, setNewMealType] = useState('')
+  const [newFood, setNewFood] = useState({ name: '', calories: 0, protein: 0, carbs: 0, fat: 0 })
+  const [filters, setFilters] = useState({
+    calories: [0, 500],
+    protein: [0, 50],
+    carbs: [0, 100],
+    fat: [0, 50],
+  })
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0]
-    if (file) {
-      setImageFile(file)
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const filteredFoods = foodItems.filter(food => 
+    food.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    food.calories >= filters.calories[0] && food.calories <= filters.calories[1] &&
+    food.protein >= filters.protein[0] && food.protein <= filters.protein[1] &&
+    food.carbs >= filters.carbs[0] && food.carbs <= filters.carbs[1] &&
+    food.fat >= filters.fat[0] && food.fat <= filters.fat[1]
+  )
+
+  const addFood = (food) => {
+    setAddedFoods([...addedFoods, food])
+  }
+
+  const removeFood = (foodId) => {
+    setAddedFoods(addedFoods.filter(food => food.id !== foodId))
+  }
+
+  const addNewMealType = () => {
+    if (newMealType && !mealTypes.includes(newMealType)) {
+      setMealTypes([...mealTypes, newMealType])
+      setSelectedMeal(newMealType)
+      setNewMealType('')
     }
   }
 
-  const analyzeImage = () => {
-    if (!imageFile) {
-      toast({
-        title: 'No image selected',
-        description: 'Please upload an image to analyze',
-        status: 'warning',
-        duration: 3000,
-        isClosable: true,
-      })
-      return
-    }
-
-    setIsAnalyzing(true)
-    // Simulating AI analysis with a timeout
-    setTimeout(() => {
-      setAnalyzedMeal({
-        name: 'Grilled Chicken Salad',
-        calories: 350,
-        protein: 30,
-        carbs: 15,
-        fat: 20,
-      })
-      setIsAnalyzing(false)
-      toast({
-        title: 'Analysis Complete',
-        description: 'Your meal has been analyzed and added to the log',
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      })
-    }, 2000)
+  const handleAddCustomFood = () => {
+    setAddedFoods([...addedFoods, { ...newFood, id: addedFoods.length + 1 }])
+    setNewFood({ name: '', calories: 0, protein: 0, carbs: 0, fat: 0 })
+    onClose()
   }
 
-  const generateRecipe = () => {
-    setIsGeneratingRecipe(true)
-    // Simulating AI recipe generation with a timeout
-    setTimeout(() => {
-      setGeneratedRecipe({
-        name: 'Quinoa Veggie Bowl',
-        cookingTime: '25 minutes',
-        ingredients: [
-          '1 cup quinoa',
-          '2 cups water',
-          '1 cup mixed vegetables (bell peppers, zucchini, carrots)',
-          '1/4 cup olive oil',
-          '1 lemon, juiced',
-          'Salt and pepper to taste',
-        ],
-        instructions: [
-          'Rinse quinoa and cook in water according to package instructions.',
-          'While quinoa is cooking, chop the vegetables.',
-          'Heat olive oil in a pan and sauté the vegetables until tender-crisp.',
-          'Fluff the cooked quinoa with a fork and mix in the sautéed vegetables.',
-          'Drizzle with lemon juice, and season with salt and pepper.',
-          'Serve warm or at room temperature.',
-        ],
-        nutritionalInfo: {
-          calories: 300,
-          protein: 10,
-          carbs: 40,
-          fat: 15,
-        },
-      })
-      setIsGeneratingRecipe(false)
-      toast({
-        title: 'Recipe Generated',
-        description: 'Your personalized recipe is ready!',
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-      })
-    }, 3000)
-  }
+  const totalNutrition = addedFoods.reduce((acc, food) => ({
+    calories: acc.calories + food.calories,
+    protein: acc.protein + food.protein,
+    carbs: acc.carbs + food.carbs,
+    fat: acc.fat + food.fat,
+  }), { calories: 0, protein: 0, carbs: 0, fat: 0 })
 
   return (
-    <Container maxW="container.xl" py={8}>
-      <VStack spacing={8} align="stretch">
-        <Heading as="h1" size="xl" textAlign="center">
-          Meal Log & Recipe Generator
-        </Heading>
+    <Box color="black" minH="100vh">
+      <Container maxW="container.xl" py={8}>
+        <Flex justifyContent="space-between" alignItems="center" mb={6}>
+          <Menu>
+            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} bg="orange.300" color="black" _hover={{ bg: "orange.400" }}>
+              Add Meal
+            </MenuButton>
+            <MenuList bg="white">
+              {mealTypes.map((meal) => (
+                <MenuItem key={meal} onClick={() => setSelectedMeal(meal)} _hover={{ bg: "orange.300" }}>
+                  {meal}
+                </MenuItem>
+              ))}
+              <MenuItem closeOnSelect={false} _hover={{ bg: "orange.300" }}>
+                <Input 
+                  placeholder="New meal type" 
+                  value={newMealType} 
+                  onChange={(e) => setNewMealType(e.target.value)}
+                  mr={2}
+                />
+                <Button onClick={addNewMealType} size="sm" bg="orange.300" _hover={{ bg: "orange.400" }}>Add</Button>
+              </MenuItem>
+            </MenuList>
+          </Menu>
+        </Flex>
 
-        <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={8}>
-          <GridItem>
-            <Box borderWidth={1} borderRadius="lg" p={6}>
-              <VStack spacing={4} align="stretch">
-                <Heading as="h2" size="lg">
-                  Log Your Meal
-                </Heading>
-                <FormControl>
-                  <FormLabel htmlFor="meal-type">Type of Meal</FormLabel>
-                  <Select
-                    id="meal-type"
-                    placeholder="Select meal type"
-                    value={mealType}
-                    onChange={(e) => setMealType(e.target.value)}
-                  >
-                    <option value="breakfast">Breakfast</option>
-                    <option value="lunch">Lunch</option>
-                    <option value="dinner">Dinner</option>
-                    <option value="snack">Snack</option>
-                  </Select>
-                </FormControl>
-                <FormControl>
-                  <FormLabel htmlFor="meal-details">Meal Details</FormLabel>
-                  <Textarea id="meal-details" placeholder="Describe your meal" />
-                </FormControl>
-                <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-                  <FormControl>
-                    <FormLabel htmlFor="calories">Calories</FormLabel>
-                    <Input type="number" id="calories" placeholder="Enter calories" />
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel htmlFor="protein">Protein (g)</FormLabel>
-                    <Input type="number" id="protein" placeholder="Enter protein" />
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel htmlFor="carbs">Carbs (g)</FormLabel>
-                    <Input type="number" id="carbs" placeholder="Enter carbs" />
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel htmlFor="fat">Fat (g)</FormLabel>
-                    <Input type="number" id="fat" placeholder="Enter fat" />
-                  </FormControl>
-                </Grid>
-                <Button colorScheme="orange" w="full">
-                  Save Meal
-                </Button>
-              </VStack>
-            </Box>
-          </GridItem>
-
-          <GridItem>
-            <Box borderWidth={1} borderRadius="lg" p={6}>
-              <VStack spacing={4} align="stretch">
-                <Heading as="h2" size="lg">
-                  AI Meal Analysis
-                </Heading>
-                <Text>Don't want to input all the details? Upload an image of your meal for AI analysis!</Text>
-                <FormControl>
-                  <FormLabel htmlFor="meal-image">Upload Meal Image</FormLabel>
-                  <Input
-                    type="file"
-                    id="meal-image"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                  />
-                </FormControl>
-                {imageFile && (
-                  <Image
-                    src={URL.createObjectURL(imageFile)}
-                    alt="Uploaded meal"
-                    maxH="200px"
-                    objectFit="cover"
-                    borderRadius="md"
-                  />
-                )}
-                <Button
-                  colorScheme="orange"
-                  onClick={analyzeImage}
-                  isLoading={isAnalyzing}
-                  loadingText="Analyzing..."
-                >
-                  Analyze Image
-                </Button>
-                {analyzedMeal && (
-                  <Box borderWidth={1} borderRadius="md" p={4}>
-                    <Heading as="h3" size="md" mb={2}>
-                      Analysis Results
-                    </Heading>
-                    <List spacing={2}>
-                      <ListItem>
-                        <Text fontWeight="bold">Meal: {analyzedMeal.name}</Text>
-                      </ListItem>
-                      <ListItem>Calories: {analyzedMeal.calories}</ListItem>
-                      <ListItem>Protein: {analyzedMeal.protein}g</ListItem>
-                      <ListItem>Carbs: {analyzedMeal.carbs}g</ListItem>
-                      <ListItem>Fat: {analyzedMeal.fat}g</ListItem>
-                    </List>
-                  </Box>
-                )}
-              </VStack>
-            </Box>
-          </GridItem>
-        </Grid>
-
-        <Box borderWidth={1} borderRadius="lg" p={6}>
-          <Heading as="h2" size="lg" mb={4}>
-            AI Recipe Maker
-          </Heading>
-          <VStack spacing={4} align="stretch">
-            <FormControl>
-              <FormLabel>Diet Type</FormLabel>
-              <Select placeholder="Select diet type">
-                <option value="vegetarian">Vegetarian</option>
-                <option value="vegan">Vegan</option>
-                <option value="gluten-free">Gluten-Free</option>
-              </Select>
-            </FormControl>
-            <FormControl>
-              <FormLabel>Cuisine Preference</FormLabel>
-              <Select placeholder="Select cuisine">
-                <option value="italian">Italian</option>
-                <option value="mexican">Mexican</option>
-                <option value="asian">Asian</option>
-              </Select>
-            </FormControl>
-            <FormControl>
-              <FormLabel>Available Ingredients</FormLabel>
-              <Input placeholder="Enter ingredients (comma-separated)" />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Meal Type</FormLabel>
-              <Stack direction={['column', 'row']} spacing={4}>
-                {['Breakfast', 'Lunch', 'Dinner', 'Snack'].map((type) => (
-                  <Checkbox key={type}>{type}</Checkbox>
-                ))}
-              </Stack>
-            </FormControl>
-            <FormControl>
-              <FormLabel>Nutritional Goals</FormLabel>
-              <Stack direction={['column', 'row']} spacing={4}>
-                <Checkbox>Low Calorie</Checkbox>
-                <Checkbox>High Protein</Checkbox>
-              </Stack>
-            </FormControl>
+        <Flex overflowX="auto" mb={6}>
+          {mealTypes.map((meal) => (
             <Button
-              colorScheme="orange"
-              onClick={generateRecipe}
-              isLoading={isGeneratingRecipe}
-              loadingText="Generating Recipe..."
+              key={meal}
+              onClick={() => setSelectedMeal(meal)}
+              mr={2}
+              bg={selectedMeal === meal ? "orange.300" : "gray.200"}
+              color="black"
+              _hover={{ bg: "orange.400" }}
             >
-              Generate Recipe
+              {meal}
             </Button>
-          </VStack>
+          ))}
+        </Flex>
 
-          {generatedRecipe && (
-            <Box mt={6} borderWidth={1} borderRadius="md" p={4}>
-              <Heading as="h3" size="md" mb={2}>
-                {generatedRecipe.name}
-              </Heading>
-              <Text mb={2}>Cooking Time: {generatedRecipe.cookingTime}</Text>
-              <Heading as="h4" size="sm" mb={2}>
-                Ingredients:
-              </Heading>
-              <List spacing={1} mb={4}>
-                {generatedRecipe.ingredients.map((ingredient, index) => (
-                  <ListItem key={index}>{ingredient}</ListItem>
-                ))}
-              </List>
-              <Heading as="h4" size="sm" mb={2}>
-                Instructions:
-              </Heading>
-              <List spacing={1} mb={4}>
-                {generatedRecipe.instructions.map((step, index) => (
-                  <ListItem key={index}>
-                    {index + 1}. {step}
-                  </ListItem>
-                ))}
-              </List>
-              <Heading as="h4" size="sm" mb={2}>
-                Nutritional Information:
-              </Heading>
-              <Flex wrap="wrap" gap={2}>
-                <Badge colorScheme="green">Calories: {generatedRecipe.nutritionalInfo.calories}</Badge>
-                <Badge colorScheme="blue">Protein: {generatedRecipe.nutritionalInfo.protein}g</Badge>
-                <Badge colorScheme="orange">Carbs: {generatedRecipe.nutritionalInfo.carbs}g</Badge>
-                <Badge colorScheme="red">Fat: {generatedRecipe.nutritionalInfo.fat}g</Badge>
-              </Flex>
-              <Button mt={4} colorScheme="orange" size="sm">
-                Save to Meal Log
-              </Button>
-            </Box>
-          )}
-        </Box>
+        <Flex flexDirection={{ base: "column", md: "row" }} gap={6}>
+          <Box flex={2}>
+            <Flex mb={4}>
+              <Input
+                placeholder="Search foods..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                flex={1}
+                mr={2}
+                bg="white"
+                color="black"
+                _placeholder={{ color: "gray.400" }}
+              />
+              <Popover>
+                <PopoverTrigger>
+                  <Button bg="orange.300" color="black" _hover={{ bg: "orange.400" }}>
+                    <SearchIcon />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent bg="white" borderColor="orange.300">
+                  <PopoverBody>
+                    <VStack spacing={4}>
+                      {Object.entries(filters).map(([key, value]) => (
+                        <Box key={key} w="100%">
+                          <FormLabel>{key.charAt(0).toUpperCase() + key.slice(1)}</FormLabel>
+                          <Slider
+                            aria-label={`${key}-range`}
+                            defaultValue={value}
+                            min={0}
+                            max={key === 'calories' ? 1000 : 100}
+                            step={1}
+                            onChange={(val) => setFilters({...filters, [key]: [0, val]})}
+                          >
+                            <SliderTrack bg="orange.100">
+                              <SliderFilledTrack bg="orange.500" />
+                            </SliderTrack>
+                            <SliderThumb boxSize={6} />
+                          </Slider>
+                          <Flex justify="space-between">
+                            <Text fontSize="sm">{value[0]}</Text>
+                            <Text fontSize="sm">{value[1]}</Text>
+                          </Flex>
+                        </Box>
+                      ))}
+                    </VStack>
+                  </PopoverBody>
+                </PopoverContent>
+              </Popover>
+            </Flex>
 
-        <Box borderWidth={1} borderRadius="lg" p={6}>
-          <Heading as="h2" size="lg" mb={4}>
-            Logged Meals History
-          </Heading>
-          <VStack spacing={4} align="stretch">
-            {['Breakfast', 'Lunch', 'Dinner'].map((meal, index) => (
-              <React.Fragment key={meal}>
-                <Flex justify="space-between" align="center">
-                  <Box>
-                    <Text fontWeight="bold">{meal}</Text>
-                    <Text fontSize="sm" color="gray.600">
-                      Oatmeal with berries
-                    </Text>
-                  </Box>
-                  <Box textAlign="right">
-                    <Text fontSize="sm" color="gray.600">
-                      Calories: 300
-                    </Text>
-                    <Text fontSize="sm" color="gray.600">
-                      Protein: 10g | Carbs: 45g | Fat: 8g
-                    </Text>
-                  </Box>
-                  <Flex>
-                    <Button size="sm" variant="ghost" mr={2}>
-                      Edit
-                    </Button>
-                    <Button size="sm" variant="ghost" colorScheme="red">
-                      Delete
+            <HStack mb={4}>
+              <Button onClick={onOpen} bg="orange.300" color="black" _hover={{ bg: "orange.400" }}>Add Your Own Meal</Button>
+              <Button variant="outline" color="orange.500" borderColor="orange.500" _hover={{ bg: "orange.300", color: "black" }}>Generate Recipe</Button>
+            </HStack>
+
+            <VStack spacing={4}>
+              {filteredFoods.map((food) => (
+                <Card key={food.id} direction="row" overflow="hidden" variant="outline" w="100%" bg="white" shadow="md">
+                  <Image objectFit="cover" maxW="100px" src={food.image} alt={food.name} />
+                  <Stack>
+                    <CardBody>
+                      <Heading size="md">{food.name}</Heading>
+                      <Text>Calories: {food.calories}</Text>
+                      <Text>Protein: {food.protein}g, Carbs: {food.carbs}g, Fat: {food.fat}g</Text>
+                      <Button mt={2} onClick={() => addFood(food)} bg="orange.300" color="black" _hover={{ bg: "orange.400" }}>Add</Button>
+                    </CardBody>
+                  </Stack>
+                </Card>
+              ))}
+            </VStack>
+          </Box>
+
+          <Box flex={1} bg="white" p={6} borderRadius="md" shadow="md">
+            <Heading size="md" mb={4}>Added Foods</Heading>
+            {addedFoods.length > 0 ? (
+              <VStack spacing={4}>
+                {addedFoods.map((food) => (
+                  <Flex key={food.id} w="100%" justify="space-between" align="center">
+                    <Text>{food.name}</Text>
+                    <Button onClick={() => removeFood(food.id)} color="orange.500">
+                      <CloseIcon />
                     </Button>
                   </Flex>
-                </Flex>
-                {index < 2 && <Divider />}
-              </React.Fragment>
-            ))}
-          </VStack>
-          <Box mt={6}>
-            <Heading as="h3" size="md" mb={2}>
-              Daily Summary
-            </Heading>
-            <Text>Total Calories: 1500 | Protein: 75g | Carbs: 180g | Fat: 50g</Text>
+                ))}
+              </VStack>
+            ) : (
+              <Text>No foods added.</Text>
+            )}
+
+            <Heading size="md" mt={6} mb={2}>Nutrition Summary</Heading>
+            <Text>Calories: {totalNutrition.calories}</Text>
+            <Text>Protein: {totalNutrition.protein}g</Text>
+            <Text>Carbs: {totalNutrition.carbs}g</Text>
+            <Text>Fat: {totalNutrition.fat}g</Text>
           </Box>
-        </Box>
-      </VStack>
-    </Container>
+        </Flex>
+      </Container>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Add Custom Food</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack spacing={4}>
+              <Input placeholder="Food name" value={newFood.name} onChange={(e) => setNewFood({ ...newFood, name: e.target.value })} />
+              <Input placeholder="Calories" type="number" value={newFood.calories} onChange={(e) => setNewFood({ ...newFood, calories: Number(e.target.value) })} />
+              <Input placeholder="Protein (g)" type="number" value={newFood.protein} onChange={(e) => setNewFood({ ...newFood, protein: Number(e.target.value) })} />
+              <Input placeholder="Carbs (g)" type="number" value={newFood.carbs} onChange={(e) => setNewFood({ ...newFood, carbs: Number(e.target.value) })} />
+              <Input placeholder="Fat (g)" type="number" value={newFood.fat} onChange={(e) => setNewFood({ ...newFood, fat: Number(e.target.value) })} />
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={handleAddCustomFood} bg="orange.300" color="black" _hover={{ bg: "orange.400" }}>Add Food</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </Box>
   )
 }

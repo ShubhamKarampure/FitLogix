@@ -35,9 +35,6 @@ export default function NotFound() {
           >
             Go to Homepage
           </Button>
-          <Button as={Link} to="/workouts" variant="outline" leftIcon={<FaArrowLeft />}>
-            Back to Workouts
-          </Button>
         </Flex>
       </Box>
       <Box as="footer" mt={16} textAlign="center">

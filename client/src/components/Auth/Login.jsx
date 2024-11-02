@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Box,
   Button,
@@ -16,19 +16,21 @@ import {
   ModalBody,
   ModalFooter,
 } from "@chakra-ui/react";
-import { login } from "../../services/authService";
+import { useUser } from "../../context/userContext";
 import { useNavigate } from "react-router-dom"; 
 
 const Login = ({ isOpen, onClose, onRegister }) => {
+  const navigate = useNavigate();
   const toast = useToast();
-  const navigate = useNavigate(); 
+  const { login } = useUser();
   
   const handleLogin = async (e) => {
     e.preventDefault();
     const email = e.target.email.value;
     const password = e.target.password.value;
+
     try {
-      await login(email, password);
+      await login(email, password); // Call the login method from context
       toast({
         title: "Login Successful.",
         description: "Welcome back!",
@@ -37,11 +39,11 @@ const Login = ({ isOpen, onClose, onRegister }) => {
         isClosable: true,
       });
       onClose(); 
-      navigate('/home/dashboard'); 
+      navigate('/home/dashboard');
     } catch (error) {
       toast({
         title: "Login Failed.",
-        description: error.response?.data?.message || "Please check your credentials.",
+        description: error.message || "Please check your credentials.",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -60,7 +62,7 @@ const Login = ({ isOpen, onClose, onRegister }) => {
             <FormControl mb={4}>
               <FormLabel htmlFor="email">Email</FormLabel>
               <Input
-                id="email"  // Added id attribute
+                id="email"  
                 name="email"
                 type="email"
                 placeholder="Enter your email"
@@ -70,7 +72,7 @@ const Login = ({ isOpen, onClose, onRegister }) => {
             <FormControl mb={4}>
               <FormLabel htmlFor="password">Password</FormLabel>
               <Input
-                id="password"  // Added id attribute
+                id="password"  
                 name="password"
                 type="password"
                 placeholder="Enter your password"

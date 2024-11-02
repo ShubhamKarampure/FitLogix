@@ -1,15 +1,31 @@
 import { useState, useEffect } from 'react';
-import { Button, Input, FormControl, FormLabel, Radio, RadioGroup, Stack, Avatar, Text, Box, Progress, useToast, Spinner } from '@chakra-ui/react';
+import {
+    Button,
+    Input,
+    FormControl,
+    FormLabel,
+    Radio,
+    RadioGroup,
+    Stack,
+    Avatar,
+    Text,
+    Box,
+    useToast,
+    Spinner,
+    Flex,
+    Spacer
+} from '@chakra-ui/react';
 import { ArrowRight, UserCircle2 } from 'lucide-react';
 import profileService from '../services/profileService';
 import { useNavigate } from "react-router-dom";
+import { useUser } from '../context/userContext';
 
-export default function Setup() {
+  export default function Setup() {
+    const { refreshUser } = useUser();
     const navigate = useNavigate(); 
     const toast = useToast();
     const [step, setStep] = useState(0);
     const [profile, setProfile] = useState({
-        user: '', 
         name: '',
         age: '',
         weight: '',
@@ -18,13 +34,6 @@ export default function Setup() {
         avatar: null,
     });
     const [loading, setLoading] = useState(false); // Loading state
-
-    useEffect(() => {
-        const userId = localStorage.getItem('user_id'); // Adjust key as needed
-        if (userId) {
-            setProfile((prevProfile) => ({ ...prevProfile, user: userId }));
-        }
-    }, []); // Run only once on component mount
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -45,9 +54,7 @@ export default function Setup() {
     };
 
     const handleNext = () => {
-        // Validation logic for age, weight, and height
-        // (same as before)
-        if (step === 1) { // Weight step
+        if (step === 1) { // Age step
             const age = parseFloat(profile.age);
             if (age < 18) {
                 toast({
@@ -115,7 +122,8 @@ export default function Setup() {
         try {
             const response = await profileService.createProfile(profile);
             console.log('Profile created successfully:', response);
-            navigate('/dashboard');
+            await refreshUser();
+            navigate('/home/dashboard');
         } catch (error) {
             console.error('Error creating profile:', error);
         } finally {
@@ -241,9 +249,37 @@ export default function Setup() {
         return profile.name && profile.age && profile.weight && profile.height && profile.gender && profile.avatar;
     };
 
+    // Keydown event listener for "Enter" key
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Prevent the default form submission
+                handleNext(); // Call handleNext function
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [step, profile]); // Dependency array includes step and profile to avoid stale closures
+
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-50">
-            <div className="w-full max-w-md space-y-8 p-8 bg-white rounded-xl shadow-lg">
+        <Flex
+            align="center"
+            justify="center"
+            minH="100vh"
+            bg="gray.50"
+        >
+            <Box
+                w="full"
+                maxW="md"
+                p={8}
+                bg="white"
+                borderRadius="xl"
+                boxShadow="lg"
+            >
                 <Text fontSize="2xl" fontWeight="bold" textAlign="center">
                     Set Up Your Profile
                 </Text>
@@ -260,41 +296,29 @@ export default function Setup() {
                     ></iframe>
                 </Box>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {steps[step].component}
-                    <div className="flex justify-between">
-                        {step > 0 && (
-                            <Button variant="outline" onClick={() => setStep(step - 1)} colorScheme="orange">
-                                Back
-                            </Button>
-                        )}
-                        {step < steps.length - 1 ? (
+                <Box maxW="lg" mx="auto" p={4}>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        {steps[step].component}
+                        <Flex mt={4} align="center"> {/* Flex container for buttons */}
+                            {step > 0 && (
+                                <Button variant="outline" onClick={() => setStep(step - 1)} colorScheme="orange">
+                                    Back
+                                </Button>
+                            )}
+                            <Spacer />
                             <Button
-                                onClick={handleNext}
-                                isDisabled={!profile[steps[step].label.toLowerCase()]} // Ensure the current step input is valid
+                                type={step === steps.length - 1 ? "submit" : "button"}
+                                onClick={step === steps.length - 1 ? handleSubmit : handleNext}
                                 colorScheme="orange"
+                                rightIcon={<ArrowRight />}
+                                isLoading={loading && step === steps.length - 1} // Disable button during loading
                             >
-                                Next <ArrowRight className="ml-2 h-4 w-4" />
+                                {step === steps.length - 1 ? 'Submit' : 'Next'}
                             </Button>
-                        ) : (
-                            <Button
-                                type="submit"
-                                colorScheme="orange"
-                                isLoading={loading} // Show loading state
-                            >
-                                Submit
-                            </Button>
-                        )}
-                    </div>
-                </form>
-
-                {loading && ( // Show loading spinner
-                    <Box textAlign="center" mt={4}>
-                        <Spinner size="lg" />
-                        <Text mt={2}>Submitting...</Text>
-                    </Box>
-                )}
-            </div>
-        </div>
+                        </Flex>
+                    </form>
+                </Box>
+            </Box>
+        </Flex>
     );
 }

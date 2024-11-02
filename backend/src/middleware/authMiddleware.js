@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 // Protected route
 export const verifyToken = (req, res, next) => {
     const token = req.cookies.token;
-
+    console.log(token)
     if (!token) {
         return res.status(401).json({ message: 'No token provided' });
     }
@@ -14,7 +14,7 @@ export const verifyToken = (req, res, next) => {
         if (err) {
             return res.status(401).json({ message: 'Token is not valid' });
         }
-        req.user = decoded; // Store decoded user info in request
+        req.userId = decoded.userId; 
         next(); // Call the next middleware or route handler
     });
 };

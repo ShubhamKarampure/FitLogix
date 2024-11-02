@@ -19,7 +19,6 @@ router.post(
   '/',
   upload.single('avatar'), // Upload avatar image
   [
-    body('user').isMongoId().withMessage('Invalid user ID'),
     body('name').notEmpty().withMessage('Name is required'),
     body('age').isInt({ min: 0 }).withMessage('Age must be a positive integer'),
     body('weight').isFloat({ min: 0 }).withMessage('Weight must be a positive number'),

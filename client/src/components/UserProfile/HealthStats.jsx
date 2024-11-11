@@ -13,58 +13,10 @@ import { useUser } from "../../context/userContext";
 import "./HeartRateComponent.css"; // For the heart icon and spinner styles
 
 const HeartRateComponent = ({orangeColor}) => {
-  const [heartRate, setHeartRate] = useState(null);
+  const [heartRate, setHeartRate] = useState(80);
   const [systolic, setSystolic] = useState(120);
   const [diastolic, setDiastolic] = useState(80);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const wsUrl = window.location.hostname === "localhost" 
-    ? "ws://localhost:8081"  // Local development URL
-    : `wss://${window.location.hostname}`;  // Production URL (using secure WebSocket `wss`)
-
-  const socket = new WebSocket(wsUrl); // Connect to WebSocket server
-
-
-    // When the connection opens
-    socket.onopen = () => {
-      console.log("Connected to WebSocket");
-    };
-
-    // When a message is received
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data); // Parse the data
-
-      // Handle heart rate data
-      if (data.heartRate) {
-        setHeartRate(data.heartRate); // Update the heart rate state
-      }
-
-      // Handle blood pressure data
-      if (data.bloodPressure) {
-        const { systolic, diastolic } = data.bloodPressure;
-        setSystolic(systolic); // Update systolic value
-        setDiastolic(diastolic); // Update diastolic value
-      }
-
-      setLoading(false); // Data is received, so stop the spinner
-    };
-
-    // Handle WebSocket errors
-    socket.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-
-    // When the connection is closed
-    socket.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
-
-    // Cleanup the WebSocket connection when the component is unmounted
-    return () => {
-      socket.close();
-    };
-  }, []); // Empty dependency array ensures this effect runs only once when the component mounts
 
   return (
     <div className="heart-rate-display">

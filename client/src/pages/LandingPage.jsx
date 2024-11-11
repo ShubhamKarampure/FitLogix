@@ -6,7 +6,7 @@ import Testimonials from '../components/LandingPage/Testimonials';
 import Footer from '../components/LandingPage/Footer';
 import TrackYourProgress from '../components/LandingPage/ProgressTrack';
 import Login from '../components/Auth/Login';
-import Register from '../components/auth/Register';
+import Register from '../components/Auth/Register.jsx';
 import HomeNavbar from '../components/LandingPage/NavBar';
 
 const LandingPage = () => {

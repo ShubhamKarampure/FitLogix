@@ -70,13 +70,12 @@ export const loginUser = async (req, res) => {
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
 
     // Set the token in an HTTP-only cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
-      maxAge: 3600000,
-    });
-
+   res.cookie('token', token, {
+  httpOnly: true,
+  sameSite: 'None',  // Allow cross-origin requests to send the cookie
+  secure: true,      // Ensure the cookie is sent over HTTPS
+  maxAge: 3600000,   // Cookie expiry of 1 hour
+});
     // Send user data excluding passwordHash
      
     const { passwordHash, ...userInfo } = user.toObject();

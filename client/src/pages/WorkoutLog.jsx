@@ -43,7 +43,8 @@ import "react-calendar/dist/Calendar.css";
 import { SearchIcon } from "@chakra-ui/icons";
 
 const WorkoutLog = () => {
-[
+
+const exercises = [
     {
         "bodyPart": "back",
         "equipment": "cable",

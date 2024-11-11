@@ -3,11 +3,11 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import { authRoutes } from '../src/routes/authRoutes.js';
-import { userRoutes } from '../src/routes/userRoutes.js';
-import { profileRoutes } from '../src/routes/profileRoutes.js';
-import { mealLogRoutes } from '../src/routes/mealLogRoutes.js';
-import { verifyToken } from '../src/middleware/authMiddleware.js';
+import { authRoutes } from './src/routes/authRoutes.js';
+import { userRoutes } from './src/routes/userRoutes.js';
+import { profileRoutes } from './src/routes/profileRoutes.js';
+import { mealLogRoutes } from './src/routes/mealLogRoutes.js';
+import { verifyToken } from './src/middleware/authMiddleware.js';
 import { WebSocketServer } from 'ws'; // Correct import
 
 dotenv.config();

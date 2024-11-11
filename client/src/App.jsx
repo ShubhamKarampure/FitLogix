@@ -13,6 +13,10 @@ import Layout from "./components/Layout";
 import LandingPage from "./pages/LandingPage";
 import RedirectToSetup from "./components/RedirectToSetup";
 import ProfileUpdate from "./components/UserProfile/UpdateProfile";
+import WorkoutLog from "./pages/WorkoutLog";
+import Chat from "./pages/Chatbot";
+import FitnessTracker from "./pages/ProgressTrack";
+import SettingsPage from "./pages/Setting";
 
 const router = createBrowserRouter([
   {
@@ -52,8 +56,24 @@ const router = createBrowserRouter([
         element: <MealLog />,
       },
       {
+        path: "progress-tracking",
+        element: <FitnessTracker/>,
+      },
+      {
+        path: "workout-log",
+        element: <WorkoutLog/>,
+      },
+      {
+        path: "chatbot",
+        element:<Chat/>
+      },
+      {
         path: "update",
         element: <ProfileUpdate />,
+      },
+      {
+        path: "settings",
+        element:<SettingsPage/>
       }
     ],
     errorElement: <PageNotFound />,

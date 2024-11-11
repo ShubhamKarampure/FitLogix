@@ -19,4 +19,7 @@ export const API_ROUTES = {
     UPDATEPROFILE: (userId) => `${API_BASE_URL}/profile/${userId}`, // For updating a profile by user ID
     DELETEPROFILE: (userId) => `${API_BASE_URL}/profile/${userId}`, // For deleting a profile by user ID
     GETALLPROFILES: `${API_BASE_URL}/profile`, // For getting all profiles (if needed)
+
+    GEMINI : "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key"
+
 };

@@ -1,263 +1,412 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Box,
   Button,
-  Card,
-  CardBody,
   Container,
   Flex,
+  Grid,
+  Wrap,
+  WrapItem,
   Heading,
   Image,
-  Input,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverBody,
-  Stack,
   Text,
-  VStack,
+  Badge,
   HStack,
+  Input,
+  FormControl,
+  FormLabel,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  NumberIncrementStepper,
+  NumberDecrementStepper,
   useDisclosure,
   Modal,
+  useToast,
   ModalOverlay,
   ModalContent,
   ModalHeader,
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Slider,
-  SliderTrack,
-  SliderFilledTrack,
-  SliderThumb,
-  FormLabel,
-} from '@chakra-ui/react'
-import { ChevronDownIcon, AddIcon, CloseIcon, SearchIcon } from '@chakra-ui/icons'
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+  VStack,
+  Progress,
+  IconButton,
+  Tooltip,
+} from "@chakra-ui/react";
+import { useUser } from "../context/userContext";
+import { Calendar } from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import { SearchIcon } from "@chakra-ui/icons";
+import { fetchData } from "../services/utils/fetchData";
+import { RepeatIcon } from "@chakra-ui/icons";
+import { motion } from "framer-motion";
+import { keyframes } from "@emotion/css";
 
-// Mock data for food items
-const foodItems = [
-  { id: 1, name: 'Grilled Chicken', calories: 165, protein: 31, carbs: 0, fat: 3.6, image: '/placeholder.svg?height=100&width=100' },
-  { id: 2, name: 'Brown Rice', calories: 216, protein: 5, carbs: 45, fat: 1.6, image: '/placeholder.svg?height=100&width=100' },
-  { id: 3, name: 'Broccoli', calories: 55, protein: 4, carbs: 11, fat: 0.6, image: '/placeholder.svg?height=100&width=100' },
-  { id: 4, name: 'Salmon', calories: 206, protein: 22, carbs: 0, fat: 13, image: '/placeholder.svg?height=100&width=100' },
-  { id: 5, name: 'Sweet Potato', calories: 180, protein: 2, carbs: 41, fat: 0.1, image: '/placeholder.svg?height=100&width=100' },
-]
+const GLASS_SIZE = 250; // ml
+const DAILY_GOAL = 2000; // ml
+const STORAGE_KEY = "waterIntake";
 
-export default function MealLog() {
-  const [selectedMeal, setSelectedMeal] = useState('Lunch')
-  const [mealTypes, setMealTypes] = useState(['Breakfast', 'Lunch', 'Dinner', 'Snack'])
-  const [searchTerm, setSearchTerm] = useState('')
-  const [addedFoods, setAddedFoods] = useState([])
-  const [newMealType, setNewMealType] = useState('')
-  const [newFood, setNewFood] = useState({ name: '', calories: 0, protein: 0, carbs: 0, fat: 0 })
-  const [filters, setFilters] = useState({
-    calories: [0, 500],
-    protein: [0, 50],
-    carbs: [0, 100],
-    fat: [0, 50],
-  })
+const fillAnimation = keyframes`
+  0% { height: 0%; }
+  100% { height: var(--fill-height); }
+`;
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
+const WaterBottle = ({ fillPercentage }) => (
+  <Box position="relative" width="12px" height="30px" margin="auto">
+    <Box
+      position="absolute"
+      bottom="0"
+      left="0"
+      right="0"
+      backgroundColor="blue.400"
+      style={{ "--fill-height": `${fillPercentage}%` }}
+      animation={`${fillAnimation} 0.5s ease-out forwards`}
+    />
+    <Box
+      position="absolute"
+      top="0"
+      left="0"
+      right="0"
+      bottom="0"
+      borderWidth="3px"
+      borderColor="blue.500"
+      borderRadius="full"
+    />
+  </Box>
+);
 
-  const filteredFoods = foodItems.filter(food => 
-    food.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-    food.calories >= filters.calories[0] && food.calories <= filters.calories[1] &&
-    food.protein >= filters.protein[0] && food.protein <= filters.protein[1] &&
-    food.carbs >= filters.carbs[0] && food.carbs <= filters.carbs[1] &&
-    food.fat >= filters.fat[0] && food.fat <= filters.fat[1]
-  )
+const MotionButton = motion(Button);
 
-  const addFood = (food) => {
-    setAddedFoods([...addedFoods, food])
-  }
+const WaterTracker = () => {
+  const [waterAmount, setWaterAmount] = useState(0);
+  const toast = useToast();
 
-  const removeFood = (foodId) => {
-    setAddedFoods(addedFoods.filter(food => food.id !== foodId))
-  }
-
-  const addNewMealType = () => {
-    if (newMealType && !mealTypes.includes(newMealType)) {
-      setMealTypes([...mealTypes, newMealType])
-      setSelectedMeal(newMealType)
-      setNewMealType('')
+  useEffect(() => {
+    const storedData = localStorage.getItem(STORAGE_KEY);
+    if (storedData) {
+      const { amount, date } = JSON.parse(storedData);
+      if (new Date(date).toDateString() === new Date().toDateString()) {
+        setWaterAmount(amount);
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
     }
-  }
+  }, []);
 
-  const handleAddCustomFood = () => {
-    setAddedFoods([...addedFoods, { ...newFood, id: addedFoods.length + 1 }])
-    setNewFood({ name: '', calories: 0, protein: 0, carbs: 0, fat: 0 })
-    onClose()
-  }
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ amount: waterAmount, date: new Date().toISOString() }));
+  }, [waterAmount]);
 
-  const totalNutrition = addedFoods.reduce((acc, food) => ({
-    calories: acc.calories + food.calories,
-    protein: acc.protein + food.protein,
-    carbs: acc.carbs + food.carbs,
-    fat: acc.fat + food.fat,
-  }), { calories: 0, protein: 0, carbs: 0, fat: 0 })
+  const addWater = () => {
+    setWaterAmount((prev) => {
+      const newAmount = Math.min(prev + GLASS_SIZE, DAILY_GOAL);
+      if (newAmount === DAILY_GOAL) {
+        toast({ title: "Goal Achieved!", status: "success", duration: 3000 });
+      }
+      return newAmount;
+    });
+  };
+
+  const removeWater = () => setWaterAmount((prev) => Math.max(prev - GLASS_SIZE, 0));
+  const resetWater = () => setWaterAmount(0);
+
+  const progress = (waterAmount / DAILY_GOAL) * 100;
 
   return (
-    <Box color="black" minH="100vh">
-      <Container maxW="container.xl" py={8}>
-        <Flex justifyContent="space-between" alignItems="center" mb={6}>
-          <Menu>
-            <MenuButton as={Button} rightIcon={<ChevronDownIcon />} bg="orange.300" color="black" _hover={{ bg: "orange.400" }}>
-              Add Meal
-            </MenuButton>
-            <MenuList bg="white">
-              {mealTypes.map((meal) => (
-                <MenuItem key={meal} onClick={() => setSelectedMeal(meal)} _hover={{ bg: "orange.300" }}>
-                  {meal}
-                </MenuItem>
-              ))}
-              <MenuItem closeOnSelect={false} _hover={{ bg: "orange.300" }}>
-                <Input 
-                  placeholder="New meal type" 
-                  value={newMealType} 
-                  onChange={(e) => setNewMealType(e.target.value)}
-                  mr={2}
-                />
-                <Button onClick={addNewMealType} size="sm" bg="orange.300" _hover={{ bg: "orange.400" }}>Add</Button>
-              </MenuItem>
-            </MenuList>
-          </Menu>
-        </Flex>
+    <Box  p={2} backgroundColor="white" borderRadius="md" boxShadow="sm" zIndex={10}>
+      <VStack spacing={2}>
+        <Text fontSize="sm">Water Tracker</Text>
+        <WaterBottle fillPercentage={progress} />
+        <Text fontSize="xs" fontWeight="bold">{waterAmount} / {DAILY_GOAL} ml</Text>
+        <Progress value={progress} width="50px" colorScheme="blue" height="8px" borderRadius="full" />
+        <Box display="flex" justifyContent="space-between" width="100%">
+          <Tooltip label="Remove 250ml">
+            <IconButton margin="5px"  icon={<Text>-</Text>} onClick={removeWater} isDisabled={waterAmount <= 0} colorScheme="red" size="sm" />
+          </Tooltip>
+          <Tooltip label="Add 250ml">
+            <IconButton margin="5px" icon={<Text>+</Text>} onClick={addWater} isDisabled={waterAmount >= DAILY_GOAL} colorScheme="blue" size="sm" />
+          </Tooltip>
+          <Tooltip  label="Reset">
+            <IconButton margin="5px" icon={<Text>🔄</Text>} onClick={resetWater} colorScheme="gray" size="sm" />
+          </Tooltip>
+        </Box>
+      </VStack>
+    </Box>
+  );
+};
 
-        <Flex overflowX="auto" mb={6}>
-          {mealTypes.map((meal) => (
-            <Button
-              key={meal}
-              onClick={() => setSelectedMeal(meal)}
-              mr={2}
-              bg={selectedMeal === meal ? "orange.300" : "gray.200"}
-              color="black"
-              _hover={{ bg: "orange.400" }}
-            >
-              {meal}
-            </Button>
-          ))}
-        </Flex>
 
-        <Flex flexDirection={{ base: "column", md: "row" }} gap={6}>
-          <Box flex={2}>
-            <Flex mb={4}>
-              <Input
-                placeholder="Search foods..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                flex={1}
-                mr={2}
-                bg="white"
-                color="black"
-                _placeholder={{ color: "gray.400" }}
-              />
-              <Popover>
-                <PopoverTrigger>
-                  <Button bg="orange.300" color="black" _hover={{ bg: "orange.400" }}>
-                    <SearchIcon />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent bg="white" borderColor="orange.300">
-                  <PopoverBody>
-                    <VStack spacing={4}>
-                      {Object.entries(filters).map(([key, value]) => (
-                        <Box key={key} w="100%">
-                          <FormLabel>{key.charAt(0).toUpperCase() + key.slice(1)}</FormLabel>
-                          <Slider
-                            aria-label={`${key}-range`}
-                            defaultValue={value}
-                            min={0}
-                            max={key === 'calories' ? 1000 : 100}
-                            step={1}
-                            onChange={(val) => setFilters({...filters, [key]: [0, val]})}
-                          >
-                            <SliderTrack bg="orange.100">
-                              <SliderFilledTrack bg="orange.500" />
-                            </SliderTrack>
-                            <SliderThumb boxSize={6} />
-                          </Slider>
-                          <Flex justify="space-between">
-                            <Text fontSize="sm">{value[0]}</Text>
-                            <Text fontSize="sm">{value[1]}</Text>
-                          </Flex>
-                        </Box>
-                      ))}
-                    </VStack>
-                  </PopoverBody>
-                </PopoverContent>
-              </Popover>
-            </Flex>
+const MealLog = () => {
+  const { user } = useUser();
+  const [date, setDate] = useState(() => {
+    const dateInUTC = new Date();
+    const utcTime = dateInUTC.getTime();
+    const ISTOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
+    return new Date(utcTime + ISTOffset);
+  });
+  const [mealLog, setMealLog] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedMeal, setSelectedMeal] = useState(null);
+  const [calories, setCalories] = useState(0);
+  const [meals, setMeals] = useState([]);
 
-            <HStack mb={4}>
-              <Button onClick={onOpen} bg="orange.300" color="black" _hover={{ bg: "orange.400" }}>Add Your Own Meal</Button>
-              <Button variant="outline" color="orange.500" borderColor="orange.500" _hover={{ bg: "orange.300", color: "black" }}>Generate Recipe</Button>
-            </HStack>
+  useEffect(() => {
+    const fetchMeals = async () => {
+      const mealsArray = [];
 
-            <VStack spacing={4}>
-              {filteredFoods.map((food) => (
-                <Card key={food.id} direction="row" overflow="hidden" variant="outline" w="100%" bg="white" shadow="md">
-                  <Image objectFit="cover" maxW="100px" src={food.image} alt={food.name} />
-                  <Stack>
-                    <CardBody>
-                      <Heading size="md">{food.name}</Heading>
-                      <Text>Calories: {food.calories}</Text>
-                      <Text>Protein: {food.protein}g, Carbs: {food.carbs}g, Fat: {food.fat}g</Text>
-                      <Button mt={2} onClick={() => addFood(food)} bg="orange.300" color="black" _hover={{ bg: "orange.400" }}>Add</Button>
-                    </CardBody>
-                  </Stack>
-                </Card>
-              ))}
-            </VStack>
-          </Box>
+      // Fetch 10 random meals
+      for (let i = 0; i < 12; i++) {
+        const mealData = await fetchData(
+          "https://www.themealdb.com/api/json/v1/1/random.php"
+        );
+        mealsArray.push(mealData.meals[0]); // Access the first (and only) item in the `meals` array
+      }
 
-          <Box flex={1} bg="white" p={6} borderRadius="md" shadow="md">
-            <Heading size="md" mb={4}>Added Foods</Heading>
-            {addedFoods.length > 0 ? (
-              <VStack spacing={4}>
-                {addedFoods.map((food) => (
-                  <Flex key={food.id} w="100%" justify="space-between" align="center">
-                    <Text>{food.name}</Text>
-                    <Button onClick={() => removeFood(food.id)} color="orange.500">
-                      <CloseIcon />
-                    </Button>
-                  </Flex>
-                ))}
-              </VStack>
+      setMeals(mealsArray);
+    };
+
+    fetchMeals();
+  }, []);
+
+  const handleDateChange = (newDate) => {
+    const utcTime = newDate.getTime();
+    const ISTOffset = 5.5 * 60 * 60 * 1000;
+    const newDateInIST = new Date(utcTime + ISTOffset);
+    setDate(newDateInIST);
+  };
+
+  const handleLogMeal = (meal, calories) => {
+    const dateString = date.toISOString().split("T")[0];
+    setMealLog((prevLog) => ({
+      ...prevLog,
+      [dateString]: {
+        ...(prevLog[dateString] || {}),
+        [meal.idMeal]: { calories },
+      },
+    }));
+    setCalories(0);
+    onClose();
+  };
+
+  const formatDate = (date) => {
+    const options = { weekday: "long", month: "long", day: "numeric" };
+    return date.toLocaleDateString("en-IN", options);
+  };
+
+  const getDayStatus = (selectedDate) => {
+    const today = new Date();
+    const selected = new Date(selectedDate);
+    today.setHours(0, 0, 0, 0);
+    selected.setHours(0, 0, 0, 0);
+
+    const diffTime = selected - today;
+
+    if (diffTime === 0) {
+      return "Today";
+    }
+    if (diffTime === 86400000) {
+      return "Tomorrow";
+    }
+    if (diffTime === -86400000) {
+      return "Yesterday";
+    }
+    return formatDate(selected);
+  };
+
+  const getLoggedMeal = (meal) => {
+    const dateString = date.toISOString().split("T")[0];
+    return mealLog[dateString]?.[meal.idMeal] || null; // Use `idMeal` here
+  };
+
+  const filteredMeals = useMemo(() => {
+    return meals.filter(
+      (meal) => meal.strMeal.toLowerCase().includes(searchTerm.toLowerCase()) // Search by meal name
+    );
+  }, [searchTerm, meals]);
+
+  const todaysMeals = useMemo(() => {
+    const dateString = date.toISOString().split("T")[0];
+    const todaysLog = mealLog[dateString] || {};
+    return Object.entries(todaysLog)
+      .map(([id, log]) => {
+        const meal = meals.find((m) => m.idMeal === id); // Use `idMeal`
+        return meal ? { ...meal, ...log } : null;
+      })
+      .filter(Boolean);
+  }, [date, mealLog, meals]);
+
+  const headerText = getDayStatus(date);
+
+  return (
+    <Container maxW="container.xl" py={8}>
+      
+      <Grid templateColumns={{ base: "1fr", md: "1fr " }} gap={6}>
+        <Grid templateColumns={{ base: "1fr", md: "1fr 1fr 1fr" }} gap={6}>
+          <Box position="relative" minW="600px" bg="white" p={4} borderRadius="md" boxShadow="sm">
+          
+            <Heading size="lg" mb={6} textAlign="center" color="primary.700">
+              {headerText}
+            </Heading>
+            {todaysMeals.length > 0 ? (
+              <TableContainer maxWidth="400px">
+                <Table variant="striped" colorScheme="gray">
+                  <Thead>
+                    <Tr>
+                      <Th>Meal</Th>
+                      <Th>Calories</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {todaysMeals.map((meal, index) => (
+                      <Tr key={index}>
+                        <Td fontWeight="bold" color="primary.700">
+                          {meal.strMeal}
+                        </Td>
+                        <Td>{meal.calories}</Td> {/* Display calories here */}
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
             ) : (
-              <Text>No foods added.</Text>
+              <Text textAlign="center" color="gray.500">
+                No meals logged for today.
+              </Text>
             )}
-
-            <Heading size="md" mt={6} mb={2}>Nutrition Summary</Heading>
-            <Text>Calories: {totalNutrition.calories}</Text>
-            <Text>Protein: {totalNutrition.protein}g</Text>
-            <Text>Carbs: {totalNutrition.carbs}g</Text>
-            <Text>Fat: {totalNutrition.fat}g</Text>
+            <Box position="absolute" bottom="10px" right="10px">
+            <WaterTracker />
+            </Box>
           </Box>
-        </Flex>
-      </Container>
+
+
+          
+         
+          <Box bg="white" p={4} borderRadius="md" boxShadow="sm">
+            <Calendar onChange={handleDateChange} value={date} />
+          </Box>
+        </Grid>
+        <Box p={4}>
+          <Flex mb={4} alignItems="center">
+            <Input
+              placeholder="Search meals..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              mr={2}
+              flex="1"
+            />
+            <Button leftIcon={<SearchIcon />} colorScheme="orange">
+              Search
+            </Button>
+          </Flex>
+        </Box>
+
+        <Grid templateColumns={{ base: "1fr", sm: "repeat(3, 1fr)" }} gap={4}>
+          {filteredMeals.map((meal) => (
+            <Box
+              key={meal.idMeal}
+              minW="100px"
+              h="350px" // Set a fixed height for uniformity
+              bg="white"
+              p={4}
+              borderRadius="md"
+              boxShadow="sm"
+              display="flex"
+              flexDirection="column"
+              justifyContent="space-between"
+            >
+              <Heading size="md" mb={2} noOfLines={2}>
+                {meal.strMeal}
+              </Heading>
+              <Image
+                src={meal.strMealThumb}
+                alt={meal.strMeal}
+                mb={4}
+                borderRadius="md"
+                objectFit="cover"
+                h="150px" // Set a fixed image height
+                w="100%" // Make the image span the card's width
+              />
+              <HStack justify="space-between" mt="auto">
+                <Button
+                  onClick={() => {
+                    setSelectedMeal(meal);
+                    onOpen();
+                  }}
+                  colorScheme="orange"
+                  variant="outline"
+                >
+                  Instructions
+                </Button>
+                <Button
+                  onClick={() => {
+                    setSelectedMeal(meal);
+                    onOpen();
+                  }}
+                  colorScheme="orange"
+                >
+                  Log Meal
+                </Button>
+              </HStack>
+              {getLoggedMeal(meal) && (
+                <Text mt={2}>
+                  Logged: {getLoggedMeal(meal).calories} calories
+                </Text>
+              )}
+            </Box>
+          ))}
+        </Grid>
+      </Grid>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add Custom Food</ModalHeader>
+          <ModalHeader>{selectedMeal?.strMeal}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <VStack spacing={4}>
-              <Input placeholder="Food name" value={newFood.name} onChange={(e) => setNewFood({ ...newFood, name: e.target.value })} />
-              <Input placeholder="Calories" type="number" value={newFood.calories} onChange={(e) => setNewFood({ ...newFood, calories: Number(e.target.value) })} />
-              <Input placeholder="Protein (g)" type="number" value={newFood.protein} onChange={(e) => setNewFood({ ...newFood, protein: Number(e.target.value) })} />
-              <Input placeholder="Carbs (g)" type="number" value={newFood.carbs} onChange={(e) => setNewFood({ ...newFood, carbs: Number(e.target.value) })} />
-              <Input placeholder="Fat (g)" type="number" value={newFood.fat} onChange={(e) => setNewFood({ ...newFood, fat: Number(e.target.value) })} />
-            </VStack>
+            <Text mb={4}>{selectedMeal?.strInstructions}</Text>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleLogMeal(selectedMeal, calories);
+              }}
+            >
+              <FormControl>
+                <FormLabel>Calories</FormLabel>
+                <NumberInput
+                  value={calories}
+                  min={1}
+                  onChange={(value) => setCalories(value)}
+                >
+                  <NumberInputField />
+                  <NumberInputStepper>
+                    <NumberIncrementStepper />
+                    <NumberDecrementStepper />
+                  </NumberInputStepper>
+                </NumberInput>
+              </FormControl>
+              <ModalFooter>
+                <Button colorScheme="blue" type="submit">
+                  Log Meal
+                </Button>
+                <Button colorScheme="red" onClick={onClose} ml={3}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </form>
           </ModalBody>
-          <ModalFooter>
-            <Button onClick={handleAddCustomFood} bg="orange.300" color="black" _hover={{ bg: "orange.400" }}>Add Food</Button>
-          </ModalFooter>
         </ModalContent>
       </Modal>
-    </Box>
-  )
-}
+    </Container>
+  );
+};
+
+export default MealLog;

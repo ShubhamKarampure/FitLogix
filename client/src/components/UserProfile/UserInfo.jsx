@@ -1,9 +1,20 @@
 import React from 'react';
 import { Avatar, Button, Box, Heading, Text, Flex } from '@chakra-ui/react';
 import { useUser } from '../../context/userContext';
+import profileService from '../../services/profileService';
 const UserInfo = () => {
+  const { refreshUser } = useUser();
   const { user } = useUser();
 
+  const updateProfile = async () => {
+    try {
+            const response = await profileService.createProfile(profile);
+            console.log('Profile created successfully:', response);
+            await refreshUser();
+        } catch (error) {
+            console.error('Error creating profile:', error);
+        }
+  }
   return (
     <Box mt={12}>
       
@@ -49,7 +60,7 @@ const UserInfo = () => {
                 />
               </Box>
             </Button>
-            <input id="profile-upload" type="file" hidden accept="image/*" />
+          <input onSubmit={updateProfile} id="profile-upload" type="file" hidden accept="image/*" />
           </Box>
           <Heading as="h2" size="xl" mt={4}>
             {user.profile.name}

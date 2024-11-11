@@ -1,22 +1,125 @@
-import React from 'react';
-import { Box, Heading, Text, Flex, Grid } from '@chakra-ui/react';
-import { useUser } from '../../context/userContext';
+import { React, useState, useEffect } from "react";
+import {
+  Box,
+  Heading,
+  Text,
+  Flex,
+  Grid,
+  HStack,
+  VStack,
+  Center,
+} from "@chakra-ui/react";
+import { useUser } from "../../context/userContext";
+import "./HeartRateComponent.css"; // For the heart icon and spinner styles
+
+const HeartRateComponent = ({orangeColor}) => {
+  const [heartRate, setHeartRate] = useState(null);
+  const [systolic, setSystolic] = useState(120);
+  const [diastolic, setDiastolic] = useState(80);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const socket = new WebSocket("ws://localhost:8081"); // Connect to WebSocket server
+
+    // When the connection opens
+    socket.onopen = () => {
+      console.log("Connected to WebSocket");
+    };
+
+    // When a message is received
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data); // Parse the data
+
+      // Handle heart rate data
+      if (data.heartRate) {
+        setHeartRate(data.heartRate); // Update the heart rate state
+      }
+
+      // Handle blood pressure data
+      if (data.bloodPressure) {
+        const { systolic, diastolic } = data.bloodPressure;
+        setSystolic(systolic); // Update systolic value
+        setDiastolic(diastolic); // Update diastolic value
+      }
+
+      setLoading(false); // Data is received, so stop the spinner
+    };
+
+    // Handle WebSocket errors
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    // When the connection is closed
+    socket.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    // Cleanup the WebSocket connection when the component is unmounted
+    return () => {
+      socket.close();
+    };
+  }, []); // Empty dependency array ensures this effect runs only once when the component mounts
+
+  return (
+    <div className="heart-rate-display">
+      <HStack justify="center">
+          <Box
+        borderWidth={1}
+        borderColor={orangeColor}
+        borderRadius="md"
+        p={2}
+          mt={2}
+           width="120px"
+          height="120px"
+        >
+            <VStack>
+          <h1>Heart Rate</h1>
+          <div className="heart">
+            {/* Fun heart icon animation */}
+            ❤️
+          </div>
+          <h1> {heartRate !== null ? heartRate : "80"}</h1>
+        </VStack>
+        </Box>
+        <Box
+        borderWidth={1}
+        borderColor={orangeColor}
+        borderRadius="md"
+        p={2}
+          mt={2}
+          width="120px"
+          height="120px"
+        >
+
+        <VStack>
+          <h1>BP</h1>
+          <div>
+            {/* Fun heart icon animation */}
+            <Text fontSize="20px">🩸</Text>
+          </div>
+          <h2>{`${systolic}/${diastolic}`}</h2>
+        </VStack>
+        </Box>
+      </HStack>
+    </div>
+  );
+};
+
 const HealthStats = ({ orangeColor }) => {
-  
   const { user } = useUser();
-  
+
   const heightInFeetAndInches = (cm) => {
-  const totalInches = cm / 2.54; // Convert cm to total inches
-  const feet = Math.floor(totalInches / 12); // Calculate feet
-  const inches = Math.round(totalInches % 12); // Calculate remaining inches
-  return `${feet}'${inches}`; // Format as feet'inches
+    const totalInches = cm / 2.54; // Convert cm to total inches
+    const feet = Math.floor(totalInches / 12); // Calculate feet
+    const inches = Math.round(totalInches % 12); // Calculate remaining inches
+    return `${feet}'${inches}`; // Format as feet'inches
   };
 
   const BMI = (weight, height) => {
     let heightInMeter = height / 100;
-    return (weight / (heightInMeter*heightInMeter)).toFixed(2)
-  }
-
+    return (weight / (heightInMeter * heightInMeter)).toFixed(2);
+  };
 
   return (
     <Box>
@@ -28,19 +131,21 @@ const HealthStats = ({ orangeColor }) => {
           <Text fontSize="sm" color="gray.500">
             Age
           </Text>
-          <Text fontWeight="semibold">{ user.profile.age}</Text>
+          <Text fontWeight="semibold">{user.profile.age}</Text>
         </Box>
         <Box>
           <Text fontSize="sm" color="gray.500">
             Gender
           </Text>
-          <Text fontWeight="semibold">{ user.profile.gender}</Text>
+          <Text fontWeight="semibold">{user.profile.gender}</Text>
         </Box>
         <Box>
           <Text fontSize="sm" color="gray.500">
             Height
           </Text>
-          <Text fontWeight="semibold">{heightInFeetAndInches(user.profile.height)}</Text>
+          <Text fontWeight="semibold">
+            {heightInFeetAndInches(user.profile.height)}
+          </Text>
         </Box>
         <Box>
           <Text fontSize="sm" color="gray.500">
@@ -60,70 +165,29 @@ const HealthStats = ({ orangeColor }) => {
           <Text fontSize="sm" color="gray.500">
             BMI
           </Text>
-          <Text fontWeight="semibold">{BMI(user.profile.weight,user.profile.height)}</Text>
+          <Text fontWeight="semibold">
+            {BMI(user.profile.weight, user.profile.height)}
+          </Text>
         </Box>
-        <Box
-          borderWidth={1}
-          borderColor={orangeColor}
-          borderRadius="md"
-          p={2}
-        >
+        <Box borderWidth={1} borderColor={orangeColor} borderRadius="md" p={2}>
           <Text fontSize="sm" color="gray.500">
             Body Fat %
           </Text>
           <Text fontWeight="semibold">18%</Text>
         </Box>
       </Box>
-      <Flex mt={4} gap={4}>
-        <Flex align="center" gap={2}>
-          <Box
-            as="svg"
-            fill="none"
-            stroke={orangeColor}
-            viewBox="0 0 24 24"
-            width={6}
-            height={6}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-            />
-          </Box>
-          <Box>
-            <Text fontSize="sm" color="gray.500">
-              Heart Rate
-            </Text>
-            <Text fontWeight="semibold">72 bpm</Text>
-          </Box>
-        </Flex>
-        <Flex align="center" gap={2}>
-          <Box
-            as="svg"
-            fill="none"
-            stroke={orangeColor}
-            viewBox="0 0 24 24"
-            width={6}
-            height={6}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M13 10V3L4 14h7v7l9-11h-7z"
-            />
-          </Box>
-          <Box>
-            <Text fontSize="sm" color="gray.500">
-              Blood Pressure
-            </Text>
-            <Text fontWeight="semibold">120/80</Text>
-          </Box>
-        </Flex>
-      </Flex>
+
+      <Box
+        borderWidth={1}
+        borderColor={orangeColor}
+        borderRadius="md"
+        p={2}
+        mt={2}
+      >
+        <HeartRateComponent orangeColor={orangeColor} />
+      </Box>
     </Box>
-  )
+  );
 };
 
 export default HealthStats;

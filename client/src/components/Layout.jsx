@@ -22,6 +22,21 @@ const Layout = () => {
     case "meal-log":
       title = "Meal Log";
       break;
+    case "progress-tracking":
+      title = "Progress Tracking";
+      break;
+    case "workout-log":
+      title = "Workout Log";
+      break;
+    case "chatbot":
+      title = "Chatbot";
+      break;
+    case "update":
+      title = "Update Profile";
+      break;
+    case "settings":
+      title = "Settings";
+      break;
     default:
       title = "Home";
       break;

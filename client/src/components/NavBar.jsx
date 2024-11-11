@@ -23,6 +23,11 @@ const Navbar = ({ page }) => {
   const navigate = useNavigate(); 
   const toast = useToast();
 
+  const handleChatbotClick = () => {
+    navigate('/home/chatbot');
+  };
+
+
   const handleLogout = async () => {
     try {
       await logout(); // Call the logout function from AuthContext
@@ -81,6 +86,7 @@ const Navbar = ({ page }) => {
           <IconButton
             aria-label="Chat"
             icon={<FiMessageCircle />}
+            onClick={handleChatbotClick}
             variant="outline"
             colorScheme="orange"
             borderColor="orange.300"

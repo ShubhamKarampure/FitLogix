@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Flex,
@@ -38,6 +38,9 @@ const HomeNavbar = ({ onLoginOpen, onRegisterOpen }) => {
   const navigate = useNavigate();
   const { isAuthenticated, loading } = useUser();
   
+  // State for handling search input
+  const [searchQuery, setSearchQuery] = useState('');
+
   // Handle login click
   const handleLoginClick = () => {
     if (isAuthenticated) {
@@ -56,7 +59,19 @@ const HomeNavbar = ({ onLoginOpen, onRegisterOpen }) => {
     }
   };
 
- 
+  // Handle search query change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Handle search submit
+  const handleSearchSubmit = () => {
+    if (searchQuery.trim()) {
+      // Implement your search logic here
+      // For example, navigate to a search results page with the query as a parameter:
+      navigate(`/search?query=${searchQuery}`);
+    }
+  };
 
   return (
     <Box
@@ -78,7 +93,6 @@ const HomeNavbar = ({ onLoginOpen, onRegisterOpen }) => {
           <HStack as={'nav'} spacing={4} display={{ base: 'none', md: 'flex' }}>
             <NavLink href="#">Home</NavLink>
             <NavLink href="#">Features</NavLink>
-            <NavLink href="#">Pricing</NavLink>
             <NavLink href="#">About</NavLink>
             <Menu>
               <MenuButton as={Button} variant="link" color="black">
@@ -97,6 +111,8 @@ const HomeNavbar = ({ onLoginOpen, onRegisterOpen }) => {
         </HStack>
         <HStack spacing={4}>
           <Input
+            value={searchQuery} // Bind the input value to the state
+            onChange={handleSearchChange} // Update state on input change
             placeholder="Search..."
             size="md"
             variant="filled"
@@ -110,6 +126,7 @@ const HomeNavbar = ({ onLoginOpen, onRegisterOpen }) => {
             icon={<FaSearch />}
             variant="outline"
             colorScheme="orange"
+            onClick={handleSearchSubmit} // Trigger search on click
           />
           <Button variant={'solid'} colorScheme={'orange'} size={'sm'} onClick={handleLoginClick}>
             Log In

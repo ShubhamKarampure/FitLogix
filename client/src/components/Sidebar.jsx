@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Stack, IconButton, Image, Text, HStack } from '@chakra-ui/react';
-import { FaHome, FaUser, FaDumbbell, FaUtensils, FaChartLine, FaBell, FaCog } from 'react-icons/fa';
+import { FaHome, FaUser, FaDumbbell, FaUtensils, FaChartLine, FaBell, FaCog} from 'react-icons/fa';
+import { IoBarbell } from 'react-icons/io5';
 import { Link, useLocation } from 'react-router-dom';
 import logo from '../assets/icon.png';
 
@@ -11,10 +12,10 @@ const Sidebar = () => {
   const menuItems = [
     { path: '/home/dashboard', icon: FaHome, label: 'Dashboard' },
     { path: '/home/profile', icon: FaUser, label: 'Profile' },
-    { path: '/home/workout-plans', icon: FaDumbbell, label: 'Workout' },
+    { path: '/home/workout-log', icon: FaDumbbell, label: 'Workout' },
     { path: '/home/meal-log', icon: FaUtensils, label: 'Meals' },
     { path: '/home/progress-tracking', icon: FaChartLine, label: 'Progress' },
-    { path: '/home/notifications', icon: FaBell, label: 'Notifications' },
+      { path: '/home/chatbot', icon: IoBarbell, label: 'ChatBot' },
     { path: '/home/settings', icon: FaCog, label: 'Settings' },
   ];
 

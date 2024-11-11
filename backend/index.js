@@ -16,9 +16,7 @@ const app = express();
 // CORS configuration
 const corsOptions = {
 origin: [
-    'https://fit-track-steel.vercel.app',
-    'https://fit-track-git-main-shubhamkarampures-projects.vercel.app',
-    'https://fit-track-8fkwcbcc5-shubhamkarampures-projects.vercel.app'
+    
   ],
   credentials: true, 
   methods: ['GET', 'PUT', 'POST', 'DELETE', 'PATCH'], // Allowed methods
@@ -43,4 +41,6 @@ app.use('/api/v1/meals', verifyToken, mealLogRoutes); // Meal logging for the au
 app.get('/', (req, res) => {
   res.json({ message: 'Server is running' });
 });
+
+export default app;
 

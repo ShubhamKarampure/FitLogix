@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://localhost:4000/api/v1';
+export const API_BASE_URL = 'https://fit-track-backend.vercel.app/';
 
 export const API_ROUTES = {
     // Login-related routes

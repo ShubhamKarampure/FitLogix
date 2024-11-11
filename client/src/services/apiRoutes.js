@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'https://fit-track-backend.vercel.app/';
+const API_BASE_URL = `${import.meta.env.VITE_BACKEND_URL}api/v1`;
 
 export const API_ROUTES = {
     // Login-related routes

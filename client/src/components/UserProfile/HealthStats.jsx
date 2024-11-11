@@ -19,7 +19,12 @@ const HeartRateComponent = ({orangeColor}) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://localhost:8081"); // Connect to WebSocket server
+    const wsUrl = window.location.hostname === "localhost" 
+    ? "ws://localhost:8081"  // Local development URL
+    : `wss://${window.location.hostname}`;  // Production URL (using secure WebSocket `wss`)
+
+  const socket = new WebSocket(wsUrl); // Connect to WebSocket server
+
 
     // When the connection opens
     socket.onopen = () => {

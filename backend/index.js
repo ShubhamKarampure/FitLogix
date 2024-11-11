@@ -37,9 +37,9 @@ app.use('/api/v1/users', verifyToken, userRoutes); // General user management
 app.use('/api/v1/profile', verifyToken, profileRoutes); // Profile actions for the authenticated user
 app.use('/api/v1/meals', verifyToken, mealLogRoutes); // Meal logging for the authenticated user
 
-
-const wss = new WebSocketServer({ port: 8081 });
-
+const wss = new WebSocketServer({
+  noServer: true // Handle WebSocket upgrade requests using the same server
+});
 // Handling WebSocket connections
 wss.on('connection', (ws) => {
   
@@ -81,7 +81,7 @@ wss.on('connection', (ws) => {
   });
 });
 
-console.log('WebSocket server running on ws://localhost:8081');
+
 
 
 // Integrate WebSocket with the Express server

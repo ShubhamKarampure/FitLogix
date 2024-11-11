@@ -15,12 +15,15 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-origin: [
-    
+  origin: [
+    'https://fit-track-steel.vercel.app',
+    'https://fit-track-git-main-shubhamkarampures-projects.vercel.app',
+    'https://fit-track-bmbd6hmeh-shubhamkarampures-projects.vercel.app'
   ],
   credentials: true, 
   methods: ['GET', 'PUT', 'POST', 'DELETE', 'PATCH'], // Allowed methods
 };
+
 
 // Middleware setup
 app.use(cors(corsOptions));
